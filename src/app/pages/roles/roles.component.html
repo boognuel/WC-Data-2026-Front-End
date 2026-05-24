@@ -3,10 +3,12 @@
     <h1>Roles</h1>
     <div class="header-actions">
       <a routerLink="/equipos" class="btn-link">Equipos</a>
+      <button type="button" (click)="abrirNuevo()">Nuevo</button>
       <button class="logout" type="button" (click)="salir()">Cerrar sesión</button>
     </div>
   </header>
 
+  @if (showForm()) {
   <section class="form-card">
     <h2>{{ editMode() ? 'Editar rol' : 'Nuevo rol' }}</h2>
     <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
@@ -15,24 +17,18 @@
           <label for="r-nombre">Nombre del rol</label>
           <input id="r-nombre" type="text" formControlName="nombreRol" aria-required="true" />
         </div>
-        <div>
-          <label for="r-estado">Estado</label>
-          <select id="r-estado" formControlName="estado" aria-required="true">
-            <option value="A">Activo</option>
-            <option value="I">Inactivo</option>
-          </select>
-        </div>
       </div>
       <div class="buttons">
         <button type="submit" [disabled]="loading() || form.invalid">
           {{ loading() ? 'Guardando...' : 'Guardar' }}
         </button>
-        <button type="button" class="secondary" (click)="limpiar()">Nuevo</button>
+        <button type="button" class="secondary" (click)="cancelar()">Cancelar</button>
       </div>
     </form>
     @if (error()) { <p class="mensaje error-text" role="alert">{{ error() }}</p> }
     @if (success()) { <p class="mensaje" role="status">{{ success() }}</p> }
   </section>
+  }
 
   <section class="table-card">
     <h2>Lista de roles</h2>
@@ -41,25 +37,28 @@
         <tr>
           <th scope="col">ID</th>
           <th scope="col">Nombre</th>
-          <th scope="col">Estado</th>
           <th scope="col">Acciones</th>
         </tr>
       </thead>
       <tbody>
-        @for (r of roles(); track r.idRol) {
+        @for (r of paginados(); track r.idRol) {
           <tr>
             <td>{{ r.idRol }}</td>
             <td>{{ r.nombreRol }}</td>
-            <td>{{ r.estado }}</td>
             <td>
-              <button class="small" type="button" (click)="editar(r)"
-                [attr.aria-label]="'Editar ' + r.nombreRol">Editar</button>
-              <button class="small danger" type="button" (click)="eliminar(r.idRol!)"
-                [attr.aria-label]="'Eliminar ' + r.nombreRol">Eliminar</button>
+              @if (r.estado === 'A') {
+                <button class="small" type="button" (click)="editar(r)" [attr.aria-label]="'Editar ' + r.nombreRol">Editar</button>
+                <button class="small danger" type="button" (click)="eliminar(r.idRol!)" [attr.aria-label]="'Eliminar ' + r.nombreRol">Eliminar</button>
+              }
             </td>
           </tr>
         }
       </tbody>
     </table>
+    <div class="pagination" aria-label="Paginación de roles">
+      <button type="button" (click)="prevPage()" [disabled]="page() === 0" aria-label="Página anterior">&#8592;</button>
+      <span>{{ page() + 1 }} / {{ totalPages() }}</span>
+      <button type="button" (click)="nextPage()" [disabled]="page() === totalPages() - 1" aria-label="Página siguiente">&#8594;</button>
+    </div>
   </section>
 </div>

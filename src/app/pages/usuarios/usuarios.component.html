@@ -4,10 +4,12 @@
     <div class="header-actions">
       <a routerLink="/roles" class="btn-link">Roles</a>
       <a routerLink="/equipos" class="btn-link">Equipos</a>
+      <button type="button" (click)="abrirNuevo()">Nuevo</button>
       <button class="logout" type="button" (click)="salir()">Cerrar sesión</button>
     </div>
   </header>
 
+  @if (showForm()) {
   <section class="form-card">
     <h2>{{ editMode() ? 'Editar usuario' : 'Nuevo usuario' }}</h2>
     <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
@@ -48,13 +50,14 @@
         <button type="submit" [disabled]="loading() || form.invalid">
           {{ loading() ? 'Guardando...' : 'Guardar' }}
         </button>
-        <button type="button" class="secondary" (click)="limpiar()">Nuevo</button>
+        <button type="button" class="secondary" (click)="cancelar()">Cancelar</button>
       </div>
     </form>
 
     @if (error()) { <p class="mensaje error-text" role="alert">{{ error() }}</p> }
     @if (success()) { <p class="mensaje" role="status">{{ success() }}</p> }
   </section>
+  }
 
   <section class="table-card">
     <h2>Lista de usuarios</h2>
@@ -71,7 +74,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (u of usuarios(); track u.idUsuario) {
+        @for (u of paginados(); track u.idUsuario) {
           <tr>
             <td>{{ u.idUsuario }}</td>
             <td>{{ u.username }}</td>
@@ -97,5 +100,10 @@
         }
       </tbody>
     </table>
+    <div class="pagination" aria-label="Paginación de usuarios">
+      <button type="button" (click)="prevPage()" [disabled]="page() === 0" aria-label="Página anterior">&#8592;</button>
+      <span>{{ page() + 1 }} / {{ totalPages() }}</span>
+      <button type="button" (click)="nextPage()" [disabled]="page() === totalPages() - 1" aria-label="Página siguiente">&#8594;</button>
+    </div>
   </section>
 </div>

@@ -4,10 +4,12 @@
     <div class="header-actions">
       <a routerLink="/grupos" class="btn-link">Grupos</a>
       <a routerLink="/equipos" class="btn-link">Equipos</a>
+      <button type="button" (click)="abrirNuevo()">Nuevo</button>
       <button class="logout" type="button" (click)="salir()">Cerrar sesión</button>
     </div>
   </header>
 
+  @if (showForm()) {
   <section class="form-card">
     <h2>{{ editMode() ? 'Editar partido' : 'Nuevo partido' }}</h2>
     <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
@@ -75,13 +77,14 @@
         <button type="submit" [disabled]="loading() || form.invalid">
           {{ loading() ? 'Guardando...' : 'Guardar' }}
         </button>
-        <button type="button" class="secondary" (click)="limpiar()">Nuevo</button>
+        <button type="button" class="secondary" (click)="cancelar()">Cancelar</button>
       </div>
     </form>
 
     @if (error()) { <p class="mensaje error-text" role="alert">{{ error() }}</p> }
     @if (success()) { <p class="mensaje" role="status">{{ success() }}</p> }
   </section>
+  }
 
   <section class="table-card">
     <h2>Lista de partidos</h2>
@@ -98,7 +101,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (p of partidos(); track p.idPartido) {
+        @for (p of paginados(); track p.idPartido) {
           <tr>
             <td>{{ p.idPartido }}</td>
             <td>{{ equipoNombre(p.idEquipoLocal) }}</td>
@@ -117,22 +120,17 @@
               </span>
             </td>
             <td>
-              <button
-                class="small"
-                type="button"
-                (click)="editar(p)"
-                [attr.aria-label]="'Editar partido ' + p.idPartido"
-              >Editar</button>
-              <button
-                class="small danger"
-                type="button"
-                (click)="eliminar(p.idPartido!)"
-                [attr.aria-label]="'Eliminar partido ' + p.idPartido"
-              >Eliminar</button>
+              <button class="small" type="button" (click)="editar(p)" [attr.aria-label]="'Editar partido ' + p.idPartido">Editar</button>
+              <button class="small danger" type="button" (click)="eliminar(p.idPartido!)" [attr.aria-label]="'Eliminar partido ' + p.idPartido">Eliminar</button>
             </td>
           </tr>
         }
       </tbody>
     </table>
+    <div class="pagination" aria-label="Paginación de partidos">
+      <button type="button" (click)="prevPage()" [disabled]="page() === 0" aria-label="Página anterior">&#8592;</button>
+      <span>{{ page() + 1 }} / {{ totalPages() }}</span>
+      <button type="button" (click)="nextPage()" [disabled]="page() === totalPages() - 1" aria-label="Página siguiente">&#8594;</button>
+    </div>
   </section>
 </div>

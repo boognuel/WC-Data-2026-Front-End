@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -21,16 +21,21 @@ export class EquiposComponent implements OnInit {
   readonly selectedFile = signal<File | null>(null);
   readonly previewUrl = signal<string | null>(null);
   readonly editMode = signal(false);
+  readonly showForm = signal(false);
   readonly error = signal<string | null>(null);
   readonly success = signal<string | null>(null);
   readonly loading = signal(false);
+  readonly page = signal(0);
+  readonly pageSize = 10;
+  readonly paginados = computed(() => this.equipos().slice(this.page() * this.pageSize, (this.page() + 1) * this.pageSize));
+  readonly totalPages = computed(() => Math.ceil(this.equipos().length / this.pageSize));
 
   readonly form = this.fb.group({
     idEquipo: [null as number | null],
     nombre: ['', Validators.required],
     idGrupo: ['', Validators.required],
     entrenador: ['', Validators.required],
-    estado: ['A', Validators.required],
+    estado: ['A'],
     bandera: [''],
     externalId: ['']
   });
@@ -56,7 +61,7 @@ export class EquiposComponent implements OnInit {
       next: () => {
         this.loading.set(false);
         this.success.set('Equipo guardado correctamente');
-        this.limpiar();
+        this.cancelar();
         this.cargar();
       },
       error: (err) => {
@@ -66,7 +71,11 @@ export class EquiposComponent implements OnInit {
     });
   }
 
+  abrirNuevo(): void { this.limpiar(); this.showForm.set(true); }
+  cancelar(): void { this.limpiar(); this.showForm.set(false); }
+
   editar(e: EquipoDTO): void {
+    this.showForm.set(true);
     this.editMode.set(true);
     this.previewUrl.set(e.bandera ?? null);
     this.form.patchValue({
@@ -81,16 +90,21 @@ export class EquiposComponent implements OnInit {
   }
 
   eliminar(id: number): void {
+    if (!window.confirm('¿Está seguro que desea eliminar este equipo?')) return;
     this.error.set(null);
     this.success.set(null);
     this.equipoService.delete(id).subscribe({
       next: () => {
         this.success.set('Equipo eliminado');
+        this.page.set(0);
         this.cargar();
       },
       error: () => this.error.set('Error al eliminar equipo')
     });
   }
+
+  nextPage(): void { if (this.page() < this.totalPages() - 1) this.page.update(p => p + 1); }
+  prevPage(): void { if (this.page() > 0) this.page.update(p => p - 1); }
 
   onFileChange(event: Event): void {
     const input = event.target as HTMLInputElement;

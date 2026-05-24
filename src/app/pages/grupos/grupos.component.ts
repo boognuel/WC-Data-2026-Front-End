@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -19,14 +19,19 @@ export class GruposComponent implements OnInit {
 
   readonly grupos = signal<GrupoDTO[]>([]);
   readonly editMode = signal(false);
+  readonly showForm = signal(false);
   readonly error = signal<string | null>(null);
   readonly success = signal<string | null>(null);
   readonly loading = signal(false);
+  readonly page = signal(0);
+  readonly pageSize = 10;
+  readonly paginados = computed(() => this.grupos().slice(this.page() * this.pageSize, (this.page() + 1) * this.pageSize));
+  readonly totalPages = computed(() => Math.ceil(this.grupos().length / this.pageSize));
 
   readonly form = this.fb.group({
     idGrupo: ['', [Validators.required, Validators.maxLength(1)]],
     descripcion: ['', Validators.required],
-    estado: ['A', Validators.required]
+    estado: ['A']
   });
 
   ngOnInit(): void { this.cargar(); }
@@ -48,7 +53,7 @@ export class GruposComponent implements OnInit {
       next: () => {
         this.loading.set(false);
         this.success.set('Grupo guardado correctamente');
-        this.limpiar();
+        this.cancelar();
         this.cargar();
       },
       error: err => {
@@ -58,7 +63,11 @@ export class GruposComponent implements OnInit {
     });
   }
 
+  abrirNuevo(): void { this.limpiar(); this.showForm.set(true); }
+  cancelar(): void { this.limpiar(); this.showForm.set(false); }
+
   editar(g: GrupoDTO): void {
+    this.showForm.set(true);
     this.editMode.set(true);
     this.form.patchValue({
       idGrupo: g.idGrupo,
@@ -68,7 +77,11 @@ export class GruposComponent implements OnInit {
     this.form.get('idGrupo')?.disable();
   }
 
+  nextPage(): void { if (this.page() < this.totalPages() - 1) this.page.update(p => p + 1); }
+  prevPage(): void { if (this.page() > 0) this.page.update(p => p - 1); }
+
   eliminar(id: string): void {
+    if (!window.confirm('¿Está seguro que desea eliminar este grupo?')) return;
     this.error.set(null);
     this.success.set(null);
     this.grupoService.delete(id).subscribe({

@@ -3,10 +3,12 @@
     <h1>Parámetros</h1>
     <div class="header-actions">
       <a routerLink="/equipos" class="btn-link">Equipos</a>
+      <button type="button" (click)="abrirNuevo()">Nuevo</button>
       <button class="logout" type="button" (click)="salir()">Cerrar sesión</button>
     </div>
   </header>
 
+  @if (showForm()) {
   <section class="form-card">
     <h2>{{ editMode() ? 'Editar parámetro' : 'Nuevo parámetro' }}</h2>
     <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
@@ -24,13 +26,6 @@
           <input id="p-vnum" type="number" formControlName="valorNumero" />
         </div>
         <div>
-          <label for="p-estado">Estado</label>
-          <select id="p-estado" formControlName="estado" aria-required="true">
-            <option value="A">Activo</option>
-            <option value="I">Inactivo</option>
-          </select>
-        </div>
-        <div>
           <label for="p-finicial">Fecha inicial</label>
           <input id="p-finicial" type="datetime-local" formControlName="fechaInicial" />
         </div>
@@ -43,12 +38,13 @@
         <button type="submit" [disabled]="loading() || form.invalid">
           {{ loading() ? 'Guardando...' : 'Guardar' }}
         </button>
-        <button type="button" class="secondary" (click)="limpiar()">Nuevo</button>
+        <button type="button" class="secondary" (click)="cancelar()">Cancelar</button>
       </div>
     </form>
     @if (error()) { <p class="mensaje error-text" role="alert">{{ error() }}</p> }
     @if (success()) { <p class="mensaje" role="status">{{ success() }}</p> }
   </section>
+  }
 
   <section class="table-card">
     <h2>Lista de parámetros</h2>
@@ -59,27 +55,30 @@
           <th scope="col">Descripción</th>
           <th scope="col">Valor texto</th>
           <th scope="col">Valor número</th>
-          <th scope="col">Estado</th>
           <th scope="col">Acciones</th>
         </tr>
       </thead>
       <tbody>
-        @for (p of parametros(); track p.idParametro) {
+        @for (p of paginados(); track p.idParametro) {
           <tr>
             <td>{{ p.idParametro }}</td>
             <td>{{ p.descripcion }}</td>
             <td>{{ p.valorTexto }}</td>
             <td>{{ p.valorNumero }}</td>
-            <td>{{ p.estado }}</td>
             <td>
-              <button class="small" type="button" (click)="editar(p)"
-                [attr.aria-label]="'Editar ' + p.descripcion">Editar</button>
-              <button class="small danger" type="button" (click)="eliminar(p.idParametro!)"
-                [attr.aria-label]="'Eliminar ' + p.descripcion">Eliminar</button>
+              @if (p.estado === 'A') {
+                <button class="small" type="button" (click)="editar(p)" [attr.aria-label]="'Editar ' + p.descripcion">Editar</button>
+                <button class="small danger" type="button" (click)="eliminar(p.idParametro!)" [attr.aria-label]="'Eliminar ' + p.descripcion">Eliminar</button>
+              }
             </td>
           </tr>
         }
       </tbody>
     </table>
+    <div class="pagination" aria-label="Paginación de parámetros">
+      <button type="button" (click)="prevPage()" [disabled]="page() === 0" aria-label="Página anterior">&#8592;</button>
+      <span>{{ page() + 1 }} / {{ totalPages() }}</span>
+      <button type="button" (click)="nextPage()" [disabled]="page() === totalPages() - 1" aria-label="Página siguiente">&#8594;</button>
+    </div>
   </section>
 </div>

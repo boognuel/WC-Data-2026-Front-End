@@ -3,10 +3,12 @@
     <h1>Equipos</h1>
     <div class="header-actions">
       <a routerLink="/jugadores" class="btn-link">Jugadores</a>
+      <button type="button" (click)="abrirNuevo()">Nuevo</button>
       <button class="logout" type="button" (click)="salir()">Cerrar sesión</button>
     </div>
   </header>
 
+  @if (showForm()) {
   <section class="form-card">
     <h2>{{ editMode() ? 'Editar equipo' : 'Nuevo equipo' }}</h2>
 
@@ -26,14 +28,6 @@
         <div>
           <label for="eq-entrenador">Entrenador</label>
           <input id="eq-entrenador" type="text" formControlName="entrenador" aria-required="true" />
-        </div>
-
-        <div>
-          <label for="eq-estado">Estado</label>
-          <select id="eq-estado" formControlName="estado" aria-required="true">
-            <option value="A">Activo</option>
-            <option value="I">Inactivo</option>
-          </select>
         </div>
 
         <div>
@@ -64,7 +58,7 @@
         <button type="submit" [disabled]="loading() || form.invalid">
           {{ loading() ? 'Guardando...' : 'Guardar' }}
         </button>
-        <button type="button" class="secondary" (click)="limpiar()">Nuevo</button>
+        <button type="button" class="secondary" (click)="cancelar()">Cancelar</button>
       </div>
     </form>
 
@@ -75,6 +69,7 @@
       <p class="mensaje" role="status">{{ success() }}</p>
     }
   </section>
+  }
 
   <section class="table-card">
     <h2>Lista de equipos</h2>
@@ -86,41 +81,36 @@
           <th scope="col">Nombre</th>
           <th scope="col">Grupo</th>
           <th scope="col">Entrenador</th>
-          <th scope="col">Estado</th>
           <th scope="col">Bandera</th>
           <th scope="col">Acciones</th>
         </tr>
       </thead>
       <tbody>
-        @for (e of equipos(); track e.idEquipo) {
+        @for (e of paginados(); track e.idEquipo) {
           <tr>
             <td>{{ e.idEquipo }}</td>
             <td>{{ e.nombre }}</td>
             <td>{{ e.idGrupo }}</td>
             <td>{{ e.entrenador }}</td>
-            <td>{{ e.estado }}</td>
             <td>
               @if (e.bandera) {
                 <img [src]="e.bandera" [alt]="'Bandera ' + e.nombre" class="thumb" />
               }
             </td>
             <td>
-              <button
-                class="small"
-                type="button"
-                [attr.aria-label]="'Editar ' + e.nombre"
-                (click)="editar(e)"
-              >Editar</button>
-              <button
-                class="small danger"
-                type="button"
-                [attr.aria-label]="'Eliminar ' + e.nombre"
-                (click)="eliminar(e.idEquipo!)"
-              >Eliminar</button>
+              @if (e.estado === 'A') {
+                <button class="small" type="button" [attr.aria-label]="'Editar ' + e.nombre" (click)="editar(e)">Editar</button>
+                <button class="small danger" type="button" [attr.aria-label]="'Eliminar ' + e.nombre" (click)="eliminar(e.idEquipo!)">Eliminar</button>
+              }
             </td>
           </tr>
         }
       </tbody>
     </table>
+    <div class="pagination" aria-label="Paginación de equipos">
+      <button type="button" (click)="prevPage()" [disabled]="page() === 0" aria-label="Página anterior">&#8592;</button>
+      <span>{{ page() + 1 }} / {{ totalPages() }}</span>
+      <button type="button" (click)="nextPage()" [disabled]="page() === totalPages() - 1" aria-label="Página siguiente">&#8594;</button>
+    </div>
   </section>
 </div>

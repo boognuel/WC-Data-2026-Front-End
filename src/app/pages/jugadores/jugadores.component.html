@@ -3,10 +3,12 @@
     <h1>Jugadores</h1>
     <div class="header-actions">
       <a routerLink="/equipos" class="btn-link">Equipos</a>
+      <button type="button" (click)="abrirNuevo()">Nuevo</button>
       <button class="logout" type="button" (click)="salir()">Cerrar sesión</button>
     </div>
   </header>
 
+  @if (showForm()) {
   <section class="form-card">
     <h2>{{ editMode() ? 'Editar jugador' : 'Nuevo jugador' }}</h2>
 
@@ -50,14 +52,6 @@
         </div>
 
         <div>
-          <label for="j-estado">Estado</label>
-          <select id="j-estado" formControlName="estado" aria-required="true">
-            <option value="A">Activo</option>
-            <option value="I">Inactivo</option>
-          </select>
-        </div>
-
-        <div>
           <label for="j-foto">Foto del jugador</label>
           <input
             id="j-foto"
@@ -80,7 +74,7 @@
         <button type="submit" [disabled]="loading() || form.invalid">
           {{ loading() ? 'Guardando...' : 'Guardar' }}
         </button>
-        <button type="button" class="secondary" (click)="limpiar()">Nuevo</button>
+        <button type="button" class="secondary" (click)="cancelar()">Cancelar</button>
       </div>
     </form>
 
@@ -91,6 +85,7 @@
       <p class="mensaje" role="status">{{ success() }}</p>
     }
   </section>
+  }
 
   <section class="table-card">
     <h2>Lista de jugadores</h2>
@@ -103,42 +98,37 @@
           <th scope="col">Posición</th>
           <th scope="col">#</th>
           <th scope="col">Equipo</th>
-          <th scope="col">Estado</th>
           <th scope="col">Foto</th>
           <th scope="col">Acciones</th>
         </tr>
       </thead>
       <tbody>
-        @for (j of jugadores(); track j.idJugador) {
+        @for (j of paginados(); track j.idJugador) {
           <tr>
             <td>{{ j.idJugador }}</td>
             <td>{{ j.nombre }}</td>
             <td>{{ j.posicion }}</td>
             <td>{{ j.numeroCamiseta }}</td>
             <td>{{ equipoNombre(j.idEquipo) }}</td>
-            <td>{{ j.estado }}</td>
             <td>
               @if (j.foto) {
                 <img [src]="j.foto" [alt]="'Foto ' + j.nombre" class="thumb" />
               }
             </td>
             <td>
-              <button
-                class="small"
-                type="button"
-                [attr.aria-label]="'Editar ' + j.nombre"
-                (click)="editar(j)"
-              >Editar</button>
-              <button
-                class="small danger"
-                type="button"
-                [attr.aria-label]="'Eliminar ' + j.nombre"
-                (click)="eliminar(j.idJugador!)"
-              >Eliminar</button>
+              @if (j.estado === 'A') {
+                <button class="small" type="button" [attr.aria-label]="'Editar ' + j.nombre" (click)="editar(j)">Editar</button>
+                <button class="small danger" type="button" [attr.aria-label]="'Eliminar ' + j.nombre" (click)="eliminar(j.idJugador!)">Eliminar</button>
+              }
             </td>
           </tr>
         }
       </tbody>
     </table>
+    <div class="pagination" aria-label="Paginación de jugadores">
+      <button type="button" (click)="prevPage()" [disabled]="page() === 0" aria-label="Página anterior">&#8592;</button>
+      <span>{{ page() + 1 }} / {{ totalPages() }}</span>
+      <button type="button" (click)="nextPage()" [disabled]="page() === totalPages() - 1" aria-label="Página siguiente">&#8594;</button>
+    </div>
   </section>
 </div>

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -23,9 +23,14 @@ export class UsuariosComponent implements OnInit {
   readonly usuarios = signal<UsuarioResponse[]>([]);
   readonly roles = signal<RolDTO[]>([]);
   readonly editMode = signal(false);
+  readonly showForm = signal(false);
   readonly error = signal<string | null>(null);
   readonly success = signal<string | null>(null);
   readonly loading = signal(false);
+  readonly page = signal(0);
+  readonly pageSize = 10;
+  readonly paginados = computed(() => this.usuarios().slice(this.page() * this.pageSize, (this.page() + 1) * this.pageSize));
+  readonly totalPages = computed(() => Math.ceil(this.usuarios().length / this.pageSize));
 
   readonly form = this.fb.group({
     idUsuario: [null as number | null],
@@ -70,7 +75,7 @@ export class UsuariosComponent implements OnInit {
       next: () => {
         this.loading.set(false);
         this.success.set('Usuario guardado correctamente');
-        this.limpiar();
+        this.cancelar();
         this.cargar();
       },
       error: err => {
@@ -80,7 +85,11 @@ export class UsuariosComponent implements OnInit {
     });
   }
 
+  abrirNuevo(): void { this.limpiar(); this.showForm.set(true); }
+  cancelar(): void { this.limpiar(); this.showForm.set(false); }
+
   editar(u: UsuarioResponse): void {
+    this.showForm.set(true);
     this.editMode.set(true);
     this.form.patchValue({
       idUsuario: u.idUsuario,
@@ -94,7 +103,11 @@ export class UsuariosComponent implements OnInit {
     this.form.get('password')?.updateValueAndValidity();
   }
 
+  nextPage(): void { if (this.page() < this.totalPages() - 1) this.page.update(p => p + 1); }
+  prevPage(): void { if (this.page() > 0) this.page.update(p => p - 1); }
+
   eliminar(id: number): void {
+    if (!window.confirm('¿Está seguro que desea eliminar este usuario?')) return;
     this.error.set(null);
     this.success.set(null);
     this.usuarioService.delete(id).subscribe({

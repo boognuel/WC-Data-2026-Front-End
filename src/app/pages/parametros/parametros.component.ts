@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -19,9 +19,14 @@ export class ParametrosComponent implements OnInit {
 
   readonly parametros = signal<ParametroDTO[]>([]);
   readonly editMode = signal(false);
+  readonly showForm = signal(false);
   readonly error = signal<string | null>(null);
   readonly success = signal<string | null>(null);
   readonly loading = signal(false);
+  readonly page = signal(0);
+  readonly pageSize = 10;
+  readonly paginados = computed(() => this.parametros().slice(this.page() * this.pageSize, (this.page() + 1) * this.pageSize));
+  readonly totalPages = computed(() => Math.ceil(this.parametros().length / this.pageSize));
 
   readonly form = this.fb.group({
     idParametro: [null as number | null],
@@ -30,7 +35,7 @@ export class ParametrosComponent implements OnInit {
     valorNumero: [null as number | null],
     fechaInicial: [''],
     fechaFinal: [''],
-    estado: ['A', Validators.required]
+    estado: ['A']
   });
 
   ngOnInit(): void { this.cargar(); }
@@ -52,7 +57,7 @@ export class ParametrosComponent implements OnInit {
       next: () => {
         this.loading.set(false);
         this.success.set('Parámetro guardado correctamente');
-        this.limpiar();
+        this.cancelar();
         this.cargar();
       },
       error: err => {
@@ -62,7 +67,11 @@ export class ParametrosComponent implements OnInit {
     });
   }
 
+  abrirNuevo(): void { this.limpiar(); this.showForm.set(true); }
+  cancelar(): void { this.limpiar(); this.showForm.set(false); }
+
   editar(p: ParametroDTO): void {
+    this.showForm.set(true);
     this.editMode.set(true);
     this.form.patchValue({
       idParametro: p.idParametro ?? null,
@@ -75,7 +84,11 @@ export class ParametrosComponent implements OnInit {
     });
   }
 
+  nextPage(): void { if (this.page() < this.totalPages() - 1) this.page.update(p => p + 1); }
+  prevPage(): void { if (this.page() > 0) this.page.update(p => p - 1); }
+
   eliminar(id: number): void {
+    if (!window.confirm('¿Está seguro que desea eliminar este parámetro?')) return;
     this.error.set(null);
     this.success.set(null);
     this.parametroService.delete(id).subscribe({
