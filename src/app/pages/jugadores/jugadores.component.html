@@ -1,0 +1,144 @@
+<div class="layout">
+  <header>
+    <h1>Jugadores</h1>
+    <div class="header-actions">
+      <a routerLink="/equipos" class="btn-link">Equipos</a>
+      <button class="logout" type="button" (click)="salir()">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <section class="form-card">
+    <h2>{{ editMode() ? 'Editar jugador' : 'Nuevo jugador' }}</h2>
+
+    <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+      <div class="grid">
+
+        <div>
+          <label for="j-nombre">Nombre</label>
+          <input id="j-nombre" type="text" formControlName="nombre" aria-required="true" />
+        </div>
+
+        <div>
+          <label for="j-posicion">Posición</label>
+          <select id="j-posicion" formControlName="posicion" aria-required="true">
+            <option value="">-- Seleccione --</option>
+            <option value="Portero">Portero</option>
+            <option value="Defensa">Defensa</option>
+            <option value="Mediocampista">Mediocampista</option>
+            <option value="Delantero">Delantero</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="j-camiseta">Número de camiseta</label>
+          <input id="j-camiseta" type="number" formControlName="numeroCamiseta" min="1" max="99" aria-required="true" />
+        </div>
+
+        <div>
+          <label for="j-equipo">Equipo</label>
+          <select id="j-equipo" formControlName="idEquipo" aria-required="true">
+            <option value="">-- Seleccione --</option>
+            @for (e of equipos(); track e.idEquipo) {
+              <option [value]="e.idEquipo">{{ e.nombre }}</option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label for="j-fecha">Fecha de nacimiento</label>
+          <input id="j-fecha" type="date" formControlName="fechaNacimiento" />
+        </div>
+
+        <div>
+          <label for="j-estado">Estado</label>
+          <select id="j-estado" formControlName="estado" aria-required="true">
+            <option value="A">Activo</option>
+            <option value="I">Inactivo</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="j-foto">Foto del jugador</label>
+          <input
+            id="j-foto"
+            type="file"
+            accept="image/*"
+            (change)="onFileChange($event)"
+            aria-label="Seleccionar foto del jugador"
+          />
+        </div>
+
+        @if (previewUrl()) {
+          <div class="preview-cell">
+            <img [src]="previewUrl()!" alt="Vista previa foto" class="preview-img" />
+          </div>
+        }
+
+      </div>
+
+      <div class="buttons">
+        <button type="submit" [disabled]="loading() || form.invalid">
+          {{ loading() ? 'Guardando...' : 'Guardar' }}
+        </button>
+        <button type="button" class="secondary" (click)="limpiar()">Nuevo</button>
+      </div>
+    </form>
+
+    @if (error()) {
+      <p class="mensaje error-text" role="alert">{{ error() }}</p>
+    }
+    @if (success()) {
+      <p class="mensaje" role="status">{{ success() }}</p>
+    }
+  </section>
+
+  <section class="table-card">
+    <h2>Lista de jugadores</h2>
+
+    <table aria-label="Tabla de jugadores">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Nombre</th>
+          <th scope="col">Posición</th>
+          <th scope="col">#</th>
+          <th scope="col">Equipo</th>
+          <th scope="col">Estado</th>
+          <th scope="col">Foto</th>
+          <th scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (j of jugadores(); track j.idJugador) {
+          <tr>
+            <td>{{ j.idJugador }}</td>
+            <td>{{ j.nombre }}</td>
+            <td>{{ j.posicion }}</td>
+            <td>{{ j.numeroCamiseta }}</td>
+            <td>{{ equipoNombre(j.idEquipo) }}</td>
+            <td>{{ j.estado }}</td>
+            <td>
+              @if (j.foto) {
+                <img [src]="j.foto" [alt]="'Foto ' + j.nombre" class="thumb" />
+              }
+            </td>
+            <td>
+              <button
+                class="small"
+                type="button"
+                [attr.aria-label]="'Editar ' + j.nombre"
+                (click)="editar(j)"
+              >Editar</button>
+              <button
+                class="small danger"
+                type="button"
+                [attr.aria-label]="'Eliminar ' + j.nombre"
+                (click)="eliminar(j.idJugador!)"
+              >Eliminar</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+</div>
