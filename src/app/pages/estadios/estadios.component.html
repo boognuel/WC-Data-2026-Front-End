@@ -1,0 +1,72 @@
+<div class="layout">
+  <header>
+    <h1>Estadios</h1>
+    <div class="header-actions">
+      <a routerLink="/equipos" class="btn-link">Equipos</a>
+      <button class="logout" type="button" (click)="salir()">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <section class="form-card">
+    <h2>{{ editMode() ? 'Editar estadio' : 'Nuevo estadio' }}</h2>
+    <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+      <div class="grid">
+        <div>
+          <label for="est-desc">Descripción</label>
+          <input id="est-desc" type="text" formControlName="descripcion" aria-required="true" />
+        </div>
+        <div>
+          <label for="est-estado">Estado</label>
+          <select id="est-estado" formControlName="estado" aria-required="true">
+            <option value="A">Activo</option>
+            <option value="I">Inactivo</option>
+          </select>
+        </div>
+        <div>
+          <label for="est-img">Imagen</label>
+          <input id="est-img" type="file" accept="image/*" (change)="onFileChange($event)" aria-label="Imagen del estadio" />
+        </div>
+        @if (previewUrl()) {
+          <div class="preview-cell">
+            <img [src]="previewUrl()!" alt="Vista previa estadio" class="preview-img" />
+          </div>
+        }
+      </div>
+      <div class="buttons">
+        <button type="submit" [disabled]="loading() || form.invalid">{{ loading() ? 'Guardando...' : 'Guardar' }}</button>
+        <button type="button" class="secondary" (click)="limpiar()">Nuevo</button>
+      </div>
+    </form>
+    @if (error()) { <p class="mensaje error-text" role="alert">{{ error() }}</p> }
+    @if (success()) { <p class="mensaje" role="status">{{ success() }}</p> }
+  </section>
+
+  <section class="table-card">
+    <h2>Lista de estadios</h2>
+    <table aria-label="Tabla de estadios">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Descripción</th>
+          <th scope="col">Estado</th>
+          <th scope="col">Imagen</th>
+          <th scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (e of estadios(); track e.idEstadio) {
+          <tr>
+            <td>{{ e.idEstadio }}</td>
+            <td>{{ e.descripcion }}</td>
+            <td>{{ e.estado }}</td>
+            <td>@if (e.imagen) { <img [src]="e.imagen" [alt]="e.descripcion" class="thumb" /> }</td>
+            <td>
+              <button class="small" type="button" (click)="editar(e)" [attr.aria-label]="'Editar ' + e.descripcion">Editar</button>
+              <button class="small danger" type="button" (click)="eliminar(e.idEstadio!)" [attr.aria-label]="'Eliminar ' + e.descripcion">Eliminar</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+</div>

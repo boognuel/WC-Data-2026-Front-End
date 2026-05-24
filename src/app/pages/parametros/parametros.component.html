@@ -1,0 +1,85 @@
+<div class="layout">
+  <header>
+    <h1>Parámetros</h1>
+    <div class="header-actions">
+      <a routerLink="/equipos" class="btn-link">Equipos</a>
+      <button class="logout" type="button" (click)="salir()">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <section class="form-card">
+    <h2>{{ editMode() ? 'Editar parámetro' : 'Nuevo parámetro' }}</h2>
+    <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+      <div class="grid">
+        <div>
+          <label for="p-desc">Descripción</label>
+          <input id="p-desc" type="text" formControlName="descripcion" aria-required="true" />
+        </div>
+        <div>
+          <label for="p-vtexto">Valor texto</label>
+          <input id="p-vtexto" type="text" formControlName="valorTexto" aria-required="true" />
+        </div>
+        <div>
+          <label for="p-vnum">Valor número</label>
+          <input id="p-vnum" type="number" formControlName="valorNumero" />
+        </div>
+        <div>
+          <label for="p-estado">Estado</label>
+          <select id="p-estado" formControlName="estado" aria-required="true">
+            <option value="A">Activo</option>
+            <option value="I">Inactivo</option>
+          </select>
+        </div>
+        <div>
+          <label for="p-finicial">Fecha inicial</label>
+          <input id="p-finicial" type="datetime-local" formControlName="fechaInicial" />
+        </div>
+        <div>
+          <label for="p-ffinal">Fecha final</label>
+          <input id="p-ffinal" type="datetime-local" formControlName="fechaFinal" />
+        </div>
+      </div>
+      <div class="buttons">
+        <button type="submit" [disabled]="loading() || form.invalid">
+          {{ loading() ? 'Guardando...' : 'Guardar' }}
+        </button>
+        <button type="button" class="secondary" (click)="limpiar()">Nuevo</button>
+      </div>
+    </form>
+    @if (error()) { <p class="mensaje error-text" role="alert">{{ error() }}</p> }
+    @if (success()) { <p class="mensaje" role="status">{{ success() }}</p> }
+  </section>
+
+  <section class="table-card">
+    <h2>Lista de parámetros</h2>
+    <table aria-label="Tabla de parámetros">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Descripción</th>
+          <th scope="col">Valor texto</th>
+          <th scope="col">Valor número</th>
+          <th scope="col">Estado</th>
+          <th scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of parametros(); track p.idParametro) {
+          <tr>
+            <td>{{ p.idParametro }}</td>
+            <td>{{ p.descripcion }}</td>
+            <td>{{ p.valorTexto }}</td>
+            <td>{{ p.valorNumero }}</td>
+            <td>{{ p.estado }}</td>
+            <td>
+              <button class="small" type="button" (click)="editar(p)"
+                [attr.aria-label]="'Editar ' + p.descripcion">Editar</button>
+              <button class="small danger" type="button" (click)="eliminar(p.idParametro!)"
+                [attr.aria-label]="'Eliminar ' + p.descripcion">Eliminar</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+</div>

@@ -1,0 +1,91 @@
+<div class="layout">
+  <header>
+    <h1>Grupos</h1>
+    <div class="header-actions">
+      <a routerLink="/equipos" class="btn-link">Equipos</a>
+      <a routerLink="/estadios" class="btn-link">Estadios</a>
+      <button class="logout" type="button" (click)="salir()">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <section class="form-card">
+    <h2>{{ editMode() ? 'Editar grupo' : 'Nuevo grupo' }}</h2>
+    <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+      <div class="grid">
+
+        <div>
+          <label for="g-id">ID Grupo (1 letra)</label>
+          <input
+            id="g-id"
+            type="text"
+            formControlName="idGrupo"
+            maxlength="1"
+            aria-required="true"
+            [attr.aria-disabled]="editMode()"
+          />
+        </div>
+
+        <div>
+          <label for="g-desc">Descripción</label>
+          <input id="g-desc" type="text" formControlName="descripcion" aria-required="true" />
+        </div>
+
+        <div>
+          <label for="g-estado">Estado</label>
+          <select id="g-estado" formControlName="estado" aria-required="true">
+            <option value="A">Activo</option>
+            <option value="I">Inactivo</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="buttons">
+        <button type="submit" [disabled]="loading() || form.invalid">
+          {{ loading() ? 'Guardando...' : 'Guardar' }}
+        </button>
+        <button type="button" class="secondary" (click)="limpiar()">Nuevo</button>
+      </div>
+    </form>
+
+    @if (error()) { <p class="mensaje error-text" role="alert">{{ error() }}</p> }
+    @if (success()) { <p class="mensaje" role="status">{{ success() }}</p> }
+  </section>
+
+  <section class="table-card">
+    <h2>Lista de grupos</h2>
+    <table aria-label="Tabla de grupos">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Descripción</th>
+          <th scope="col">Estado</th>
+          <th scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (g of grupos(); track g.idGrupo) {
+          <tr>
+            <td>{{ g.idGrupo }}</td>
+            <td>{{ g.descripcion }}</td>
+            <td>{{ g.estado }}</td>
+            <td>
+              <button
+                class="small"
+                type="button"
+                (click)="editar(g)"
+                [attr.aria-label]="'Editar grupo ' + g.idGrupo"
+              >Editar</button>
+              <button
+                class="small danger"
+                type="button"
+                (click)="eliminar(g.idGrupo)"
+                [attr.aria-label]="'Eliminar grupo ' + g.idGrupo"
+              >Eliminar</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+</div>
