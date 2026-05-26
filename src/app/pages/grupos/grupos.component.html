@@ -1,50 +1,44 @@
 <div class="layout">
   <header>
     <h1>Grupos</h1>
-    <div class="header-actions">
-      <a routerLink="/equipos" class="btn-link">Equipos</a>
-      <a routerLink="/estadios" class="btn-link">Estadios</a>
-      <button type="button" (click)="abrirNuevo()">Nuevo</button>
-      <button class="logout" type="button" (click)="salir()">Cerrar sesión</button>
-    </div>
+    <button type="button" (click)="abrirNuevo()">Nuevo</button>
   </header>
 
   @if (showForm()) {
-  <section class="form-card">
-    <h2>{{ editMode() ? 'Editar grupo' : 'Nuevo grupo' }}</h2>
-    <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
-      <div class="grid">
-
-        <div>
-          <label for="g-id">ID Grupo (1 letra)</label>
-          <input
-            id="g-id"
-            type="text"
-            formControlName="idGrupo"
-            maxlength="1"
-            aria-required="true"
-            [attr.aria-disabled]="editMode()"
-          />
+    <section class="form-card">
+      <h2>{{ editMode() ? 'Editar grupo' : 'Nuevo grupo' }}</h2>
+      <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+        <div class="grid">
+          <div>
+            <label for="g-id">ID Grupo (1 letra, ej: A)</label>
+            <input
+              id="g-id"
+              type="text"
+              formControlName="idGrupo"
+              maxlength="1"
+              [attr.disabled]="editMode() ? true : null"
+              aria-required="true"
+            />
+          </div>
+          <div>
+            <label for="g-desc">Descripción</label>
+            <input id="g-desc" type="text" formControlName="descripcion" aria-required="true" />
+          </div>
         </div>
-
-        <div>
-          <label for="g-desc">Descripción</label>
-          <input id="g-desc" type="text" formControlName="descripcion" aria-required="true" />
+        <div class="buttons">
+          <button type="submit" [disabled]="loading() || form.invalid">
+            {{ loading() ? 'Guardando...' : 'Guardar' }}
+          </button>
+          <button type="button" class="secondary" (click)="cancelar()">Cancelar</button>
         </div>
-
-      </div>
-
-      <div class="buttons">
-        <button type="submit" [disabled]="loading() || form.invalid">
-          {{ loading() ? 'Guardando...' : 'Guardar' }}
-        </button>
-        <button type="button" class="secondary" (click)="cancelar()">Cancelar</button>
-      </div>
-    </form>
-
-    @if (error()) { <p class="mensaje error-text" role="alert">{{ error() }}</p> }
-    @if (success()) { <p class="mensaje" role="status">{{ success() }}</p> }
-  </section>
+      </form>
+      @if (error()) {
+        <p class="mensaje error-text" role="alert">{{ error() }}</p>
+      }
+      @if (success()) {
+        <p class="mensaje" role="status">{{ success() }}</p>
+      }
+    </section>
   }
 
   <section class="table-card">
@@ -54,6 +48,7 @@
         <tr>
           <th scope="col">ID</th>
           <th scope="col">Descripción</th>
+          <th scope="col">Estado</th>
           <th scope="col">Acciones</th>
         </tr>
       </thead>
@@ -62,10 +57,25 @@
           <tr>
             <td>{{ g.idGrupo }}</td>
             <td>{{ g.descripcion }}</td>
+            <td>{{ g.estado === 'A' ? 'Activo' : 'Inactivo' }}</td>
             <td>
               @if (g.estado === 'A') {
-                <button class="small" type="button" (click)="editar(g)" [attr.aria-label]="'Editar grupo ' + g.idGrupo">Editar</button>
-                <button class="small danger" type="button" (click)="eliminar(g.idGrupo)" [attr.aria-label]="'Eliminar grupo ' + g.idGrupo">Eliminar</button>
+                <button
+                  class="small"
+                  type="button"
+                  (click)="editar(g)"
+                  [attr.aria-label]="'Editar grupo ' + g.idGrupo"
+                >
+                  Editar
+                </button>
+                <button
+                  class="small danger"
+                  type="button"
+                  (click)="eliminar(g.idGrupo!)"
+                  [attr.aria-label]="'Eliminar grupo ' + g.idGrupo"
+                >
+                  Eliminar
+                </button>
               }
             </td>
           </tr>
@@ -73,9 +83,23 @@
       </tbody>
     </table>
     <div class="pagination" aria-label="Paginación de grupos">
-      <button type="button" (click)="prevPage()" [disabled]="page() === 0" aria-label="Página anterior">&#8592;</button>
+      <button
+        type="button"
+        (click)="prevPage()"
+        [disabled]="page() === 0"
+        aria-label="Página anterior"
+      >
+        &#8592;
+      </button>
       <span>{{ page() + 1 }} / {{ totalPages() }}</span>
-      <button type="button" (click)="nextPage()" [disabled]="page() === totalPages() - 1" aria-label="Página siguiente">&#8594;</button>
+      <button
+        type="button"
+        (click)="nextPage()"
+        [disabled]="page() === totalPages() - 1"
+        aria-label="Página siguiente"
+      >
+        &#8594;
+      </button>
     </div>
   </section>
 </div>

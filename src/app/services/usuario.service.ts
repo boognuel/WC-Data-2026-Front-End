@@ -1,30 +1,15 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { UsuarioRequest, UsuarioResponse } from '../models/usuario.model';
+import { UsuarioResponseDTO, UsuarioRequestDTO } from '../models/usuario.model';
+
+const BASE = 'http://localhost:8114/Mundial2026_V1';
 
 @Injectable({ providedIn: 'root' })
 export class UsuarioService {
-  private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:114/Mundial2026_V1/usuario';
-
-  getAll(): Observable<UsuarioResponse[]> {
-    return this.http.get<UsuarioResponse[]>(`${this.baseUrl}/getAll`);
-  }
-
-  save(dto: UsuarioRequest): Observable<UsuarioResponse> {
-    return this.http.post<UsuarioResponse>(`${this.baseUrl}/saveUsuario`, dto);
-  }
-
-  findById(id: number): Observable<UsuarioResponse> {
-    return this.http.get<UsuarioResponse>(`${this.baseUrl}/findRecord/${id}`);
-  }
-
-  delete(id: number): Observable<UsuarioResponse> {
-    return this.http.delete<UsuarioResponse>(`${this.baseUrl}/deleteUsuario/${id}`);
-  }
-
-  desbloquear(id: number): Observable<UsuarioResponse> {
-    return this.http.post<UsuarioResponse>(`${this.baseUrl}/desbloquear/${id}`, {});
-  }
+  constructor(private http: HttpClient) {  }
+  getAll(): Observable<UsuarioResponseDTO[]> { return this.http.get<UsuarioResponseDTO[]>(`${BASE}/usuario/getAll`); }
+  save(dto: UsuarioRequestDTO): Observable<UsuarioResponseDTO> { return this.http.post<UsuarioResponseDTO>(`${BASE}/usuario/saveUsuario`, dto); }
+  desbloquear(id: number): Observable<UsuarioResponseDTO> { return this.http.post<UsuarioResponseDTO>(`${BASE}/usuario/desbloquear/${id}`, {}); }
+  delete(id: number): Observable<any> { return this.http.delete(`${BASE}/usuario/deleteUsuario/${id}`); }
 }

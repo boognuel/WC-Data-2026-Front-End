@@ -1,49 +1,67 @@
 <div class="layout">
   <header>
     <h1>Parámetros</h1>
-    <div class="header-actions">
-      <a routerLink="/equipos" class="btn-link">Equipos</a>
-      <button type="button" (click)="abrirNuevo()">Nuevo</button>
-      <button class="logout" type="button" (click)="salir()">Cerrar sesión</button>
-    </div>
+    <button type="button" (click)="abrirNuevo()">Nuevo</button>
   </header>
 
   @if (showForm()) {
-  <section class="form-card">
-    <h2>{{ editMode() ? 'Editar parámetro' : 'Nuevo parámetro' }}</h2>
-    <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
-      <div class="grid">
-        <div>
-          <label for="p-desc">Descripción</label>
-          <input id="p-desc" type="text" formControlName="descripcion" aria-required="true" />
+    <section class="form-card">
+      <h2>{{ editMode() ? 'Editar parámetro' : 'Nuevo parámetro' }}</h2>
+      <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+        <div class="grid">
+          <div>
+            <label for="pm-desc">Descripción / Clave</label>
+            <input
+              id="pm-desc"
+              type="text"
+              formControlName="descripcion"
+              aria-required="true"
+              placeholder="Ej: DIAS_CAMBIO_CLAVE"
+            />
+          </div>
+
+          <div>
+            <label for="pm-txt">Valor texto</label>
+            <input id="pm-txt" type="text" formControlName="valorTexto" />
+          </div>
+
+          <div>
+            <label for="pm-num">Valor numérico</label>
+            <input id="pm-num" type="number" formControlName="valorNumero" />
+          </div>
+
+          <div>
+            <label for="pm-fi">Fecha inicial</label>
+            <input id="pm-fi" type="date" formControlName="fechaInicial" />
+          </div>
+
+          <div>
+            <label for="pm-ff">Fecha final</label>
+            <input id="pm-ff" type="date" formControlName="fechaFinal" />
+          </div>
+
+          <div>
+            <label for="pm-estado">Estado</label>
+            <select id="pm-estado" formControlName="estado">
+              <option value="A">Activo</option>
+              <option value="I">Inactivo</option>
+            </select>
+          </div>
         </div>
-        <div>
-          <label for="p-vtexto">Valor texto</label>
-          <input id="p-vtexto" type="text" formControlName="valorTexto" aria-required="true" />
+        <div class="buttons">
+          <button type="submit" [disabled]="loading() || form.invalid">
+            {{ loading() ? 'Guardando...' : 'Guardar' }}
+          </button>
+          <button type="button" class="secondary" (click)="cancelar()">Cancelar</button>
         </div>
-        <div>
-          <label for="p-vnum">Valor número</label>
-          <input id="p-vnum" type="number" formControlName="valorNumero" />
-        </div>
-        <div>
-          <label for="p-finicial">Fecha inicial</label>
-          <input id="p-finicial" type="datetime-local" formControlName="fechaInicial" />
-        </div>
-        <div>
-          <label for="p-ffinal">Fecha final</label>
-          <input id="p-ffinal" type="datetime-local" formControlName="fechaFinal" />
-        </div>
-      </div>
-      <div class="buttons">
-        <button type="submit" [disabled]="loading() || form.invalid">
-          {{ loading() ? 'Guardando...' : 'Guardar' }}
-        </button>
-        <button type="button" class="secondary" (click)="cancelar()">Cancelar</button>
-      </div>
-    </form>
-    @if (error()) { <p class="mensaje error-text" role="alert">{{ error() }}</p> }
-    @if (success()) { <p class="mensaje" role="status">{{ success() }}</p> }
-  </section>
+      </form>
+      @if (error()) {
+        <p class="mensaje error-text" role="alert">{{ error() }}</p>
+      }
+      @if (success()) {
+        <p class="mensaje" role="status">{{ success() }}</p>
+      }
+    </section>
   }
 
   <section class="table-card">
@@ -54,7 +72,8 @@
           <th scope="col">ID</th>
           <th scope="col">Descripción</th>
           <th scope="col">Valor texto</th>
-          <th scope="col">Valor número</th>
+          <th scope="col">Valor numérico</th>
+          <th scope="col">Estado</th>
           <th scope="col">Acciones</th>
         </tr>
       </thead>
@@ -65,20 +84,47 @@
             <td>{{ p.descripcion }}</td>
             <td>{{ p.valorTexto }}</td>
             <td>{{ p.valorNumero }}</td>
+            <td>{{ p.estado === 'A' ? 'Activo' : 'Inactivo' }}</td>
             <td>
-              @if (p.estado === 'A') {
-                <button class="small" type="button" (click)="editar(p)" [attr.aria-label]="'Editar ' + p.descripcion">Editar</button>
-                <button class="small danger" type="button" (click)="eliminar(p.idParametro!)" [attr.aria-label]="'Eliminar ' + p.descripcion">Eliminar</button>
-              }
+              <button
+                class="small"
+                type="button"
+                (click)="editar(p)"
+                [attr.aria-label]="'Editar ' + p.descripcion"
+              >
+                Editar
+              </button>
+              <button
+                class="small danger"
+                type="button"
+                (click)="eliminar(p.idParametro!)"
+                [attr.aria-label]="'Eliminar ' + p.descripcion"
+              >
+                Eliminar
+              </button>
             </td>
           </tr>
         }
       </tbody>
     </table>
     <div class="pagination" aria-label="Paginación de parámetros">
-      <button type="button" (click)="prevPage()" [disabled]="page() === 0" aria-label="Página anterior">&#8592;</button>
+      <button
+        type="button"
+        (click)="prevPage()"
+        [disabled]="page() === 0"
+        aria-label="Página anterior"
+      >
+        &#8592;
+      </button>
       <span>{{ page() + 1 }} / {{ totalPages() }}</span>
-      <button type="button" (click)="nextPage()" [disabled]="page() === totalPages() - 1" aria-label="Página siguiente">&#8594;</button>
+      <button
+        type="button"
+        (click)="nextPage()"
+        [disabled]="page() === totalPages() - 1"
+        aria-label="Página siguiente"
+      >
+        &#8594;
+      </button>
     </div>
   </section>
 </div>

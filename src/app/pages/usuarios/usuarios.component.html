@@ -1,62 +1,72 @@
 <div class="layout">
   <header>
     <h1>Usuarios</h1>
-    <div class="header-actions">
-      <a routerLink="/roles" class="btn-link">Roles</a>
-      <a routerLink="/equipos" class="btn-link">Equipos</a>
-      <button type="button" (click)="abrirNuevo()">Nuevo</button>
-      <button class="logout" type="button" (click)="salir()">Cerrar sesión</button>
-    </div>
+    <button type="button" (click)="abrirNuevo()">Nuevo</button>
   </header>
 
   @if (showForm()) {
-  <section class="form-card">
-    <h2>{{ editMode() ? 'Editar usuario' : 'Nuevo usuario' }}</h2>
-    <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
-      <div class="grid">
+    <section class="form-card">
+      <h2>{{ editMode() ? 'Editar usuario' : 'Nuevo usuario' }}</h2>
+      <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+        <div class="grid">
+          <div>
+            <label for="u-username">Username (correo)</label>
+            <input
+              id="u-username"
+              type="email"
+              formControlName="username"
+              [attr.disabled]="editMode() ? true : null"
+              aria-required="true"
+            />
+          </div>
 
-        <div>
-          <label for="u-username">Username</label>
-          <input id="u-username" type="text" formControlName="username"
-            aria-required="true" autocomplete="username" />
+          @if (!editMode()) {
+            <div>
+              <label for="u-pass">Contraseña</label>
+              <input
+                id="u-pass"
+                type="password"
+                formControlName="password"
+                aria-required="true"
+                placeholder="6-8 chars, mayúsc, minúsc, número"
+              />
+            </div>
+          }
+
+          <div>
+            <label for="u-nombre">Nombre y apellido</label>
+            <input
+              id="u-nombre"
+              type="text"
+              formControlName="nombreapellido"
+              aria-required="true"
+            />
+          </div>
+
+          <div>
+            <label for="u-rol">Rol</label>
+            <select id="u-rol" formControlName="idRol" aria-required="true">
+              <option value="">-- Seleccione --</option>
+              @for (r of roles(); track r.idRol) {
+                <option [value]="r.idRol">{{ r.nombreRol }}</option>
+              }
+            </select>
+          </div>
         </div>
-
-        <div>
-          <label for="u-password">
-            {{ editMode() ? 'Nueva contraseña (dejar vacío para no cambiar)' : 'Contraseña' }}
-          </label>
-          <input id="u-password" type="password" formControlName="password"
-            autocomplete="new-password" />
+        <div class="buttons">
+          <button type="submit" [disabled]="loading() || form.invalid">
+            {{ loading() ? 'Guardando...' : 'Guardar' }}
+          </button>
+          <button type="button" class="secondary" (click)="cancelar()">Cancelar</button>
         </div>
-
-        <div>
-          <label for="u-nombre">Nombre y apellido</label>
-          <input id="u-nombre" type="text" formControlName="nombreapellido" aria-required="true" />
-        </div>
-
-        <div>
-          <label for="u-rol">Rol</label>
-          <select id="u-rol" formControlName="idRol" aria-required="true">
-            <option value="">-- Seleccione --</option>
-            @for (r of roles(); track r.idRol) {
-              <option [value]="r.idRol">{{ r.nombreRol }}</option>
-            }
-          </select>
-        </div>
-
-      </div>
-
-      <div class="buttons">
-        <button type="submit" [disabled]="loading() || form.invalid">
-          {{ loading() ? 'Guardando...' : 'Guardar' }}
-        </button>
-        <button type="button" class="secondary" (click)="cancelar()">Cancelar</button>
-      </div>
-    </form>
-
-    @if (error()) { <p class="mensaje error-text" role="alert">{{ error() }}</p> }
-    @if (success()) { <p class="mensaje" role="status">{{ success() }}</p> }
-  </section>
+      </form>
+      @if (error()) {
+        <p class="mensaje error-text" role="alert">{{ error() }}</p>
+      }
+      @if (success()) {
+        <p class="mensaje" role="status">{{ success() }}</p>
+      }
+    </section>
   }
 
   <section class="table-card">
@@ -75,35 +85,67 @@
       </thead>
       <tbody>
         @for (u of paginados(); track u.idUsuario) {
-          <tr>
+          <tr [class.bloqueado]="u.estado === 'I'">
             <td>{{ u.idUsuario }}</td>
             <td>{{ u.username }}</td>
             <td>{{ u.nombreapellido }}</td>
             <td>{{ rolNombre(u.idRol) }}</td>
             <td>
-              <span [class]="u.estado === 'A' ? 'badge badge-activo' : 'badge badge-inactivo'">
+              <span [class]="u.estado === 'A' ? 'badge-activo' : 'badge-inactivo'">
                 {{ u.estado === 'A' ? 'Activo' : 'Bloqueado' }}
               </span>
             </td>
-            <td>{{ u.intentos }}</td>
+            <td>{{ u.intentos ?? 0 }}</td>
             <td>
-              <button class="small" type="button" (click)="editar(u)"
-                [attr.aria-label]="'Editar ' + u.username">Editar</button>
+              <button
+                class="small"
+                type="button"
+                (click)="editar(u)"
+                [attr.aria-label]="'Editar ' + u.username"
+              >
+                Editar
+              </button>
               @if (u.estado === 'I') {
-                <button class="small warning" type="button" (click)="desbloquear(u.idUsuario)"
-                  [attr.aria-label]="'Desbloquear ' + u.username">Desbloquear</button>
+                <button
+                  class="small warn"
+                  type="button"
+                  (click)="desbloquear(u.idUsuario!)"
+                  [attr.aria-label]="'Desbloquear ' + u.username"
+                >
+                  Desbloquear
+                </button>
               }
-              <button class="small danger" type="button" (click)="eliminar(u.idUsuario)"
-                [attr.aria-label]="'Eliminar ' + u.username">Eliminar</button>
+              <button
+                class="small danger"
+                type="button"
+                (click)="eliminar(u.idUsuario!)"
+                [attr.aria-label]="'Eliminar ' + u.username"
+              >
+                Eliminar
+              </button>
             </td>
           </tr>
         }
       </tbody>
     </table>
     <div class="pagination" aria-label="Paginación de usuarios">
-      <button type="button" (click)="prevPage()" [disabled]="page() === 0" aria-label="Página anterior">&#8592;</button>
+      <button
+        type="button"
+        (click)="prevPage()"
+        [disabled]="page() === 0"
+        aria-label="Página anterior"
+      >
+        &#8592;
+      </button>
       <span>{{ page() + 1 }} / {{ totalPages() }}</span>
-      <button type="button" (click)="nextPage()" [disabled]="page() === totalPages() - 1" aria-label="Página siguiente">&#8594;</button>
+      <button
+        type="button"
+        (click)="nextPage()"
+        [disabled]="page() === totalPages() - 1"
+        aria-label="Página siguiente"
+      >
+        &#8594;
+      </button>
     </div>
   </section>
 </div>

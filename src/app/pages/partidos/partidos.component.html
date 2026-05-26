@@ -1,89 +1,76 @@
 <div class="layout">
   <header>
     <h1>Partidos</h1>
-    <div class="header-actions">
-      <a routerLink="/grupos" class="btn-link">Grupos</a>
-      <a routerLink="/equipos" class="btn-link">Equipos</a>
-      <button type="button" (click)="abrirNuevo()">Nuevo</button>
-      <button class="logout" type="button" (click)="salir()">Cerrar sesión</button>
-    </div>
+    <button type="button" (click)="abrirNuevo()">Nuevo</button>
   </header>
 
   @if (showForm()) {
-  <section class="form-card">
-    <h2>{{ editMode() ? 'Editar partido' : 'Nuevo partido' }}</h2>
-    <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
-      <div class="grid">
+    <section class="form-card">
+      <h2>{{ editMode() ? 'Editar partido' : 'Nuevo partido' }}</h2>
+      <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+        <div class="grid">
+          <div>
+            <label for="p-local">Equipo local</label>
+            <select id="p-local" formControlName="idEquipoLocal" aria-required="true">
+              <option value="">-- Seleccione --</option>
+              @for (e of equipos(); track e.idEquipo) {
+                <option [value]="e.idEquipo">{{ e.nombre }}</option>
+              }
+            </select>
+          </div>
 
-        <div>
-          <label for="p-local">Equipo Local</label>
-          <select id="p-local" formControlName="idEquipoLocal" aria-required="true">
-            <option value="">-- Seleccione --</option>
-            @for (e of equipos(); track e.idEquipo) {
-              <option [value]="e.idEquipo">{{ e.nombre }}</option>
-            }
-          </select>
+          <div>
+            <label for="p-visitante">Equipo visitante</label>
+            <select id="p-visitante" formControlName="idEquipoVisitante" aria-required="true">
+              <option value="">-- Seleccione --</option>
+              @for (e of equipos(); track e.idEquipo) {
+                <option [value]="e.idEquipo">{{ e.nombre }}</option>
+              }
+            </select>
+          </div>
+
+          <div>
+            <label for="p-fase">Fase</label>
+            <select id="p-fase" formControlName="fase" aria-required="true">
+              <option value="">-- Seleccione --</option>
+              <option value="Grupos">Grupos</option>
+              <option value="Octavos">Octavos de final</option>
+              <option value="Cuartos">Cuartos de final</option>
+              <option value="Semis">Semifinal</option>
+              <option value="Tercero">Tercer puesto</option>
+              <option value="Final">Final</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="p-fecha">Fecha y hora</label>
+            <input id="p-fecha" type="datetime-local" formControlName="fechaHora" />
+          </div>
+
+          <div>
+            <label for="p-glocal">Goles local</label>
+            <input id="p-glocal" type="number" formControlName="golesLocal" min="0" />
+          </div>
+
+          <div>
+            <label for="p-gvisitante">Goles visitante</label>
+            <input id="p-gvisitante" type="number" formControlName="golesVisitante" min="0" />
+          </div>
         </div>
-
-        <div>
-          <label for="p-visitante">Equipo Visitante</label>
-          <select id="p-visitante" formControlName="idEquipoVisitante" aria-required="true">
-            <option value="">-- Seleccione --</option>
-            @for (e of equipos(); track e.idEquipo) {
-              <option [value]="e.idEquipo">{{ e.nombre }}</option>
-            }
-          </select>
+        <div class="buttons">
+          <button type="submit" [disabled]="loading() || form.invalid">
+            {{ loading() ? 'Guardando...' : 'Guardar' }}
+          </button>
+          <button type="button" class="secondary" (click)="cancelar()">Cancelar</button>
         </div>
-
-        <div>
-          <label for="p-fase">Fase</label>
-          <select id="p-fase" formControlName="fase" aria-required="true">
-            <option value="">-- Seleccione --</option>
-            <option value="Grupos">Grupos</option>
-            <option value="Octavos">Octavos</option>
-            <option value="Cuartos">Cuartos</option>
-            <option value="Semifinal">Semifinal</option>
-            <option value="Final">Final</option>
-          </select>
-        </div>
-
-        <div>
-          <label for="p-fecha">Fecha y Hora</label>
-          <input id="p-fecha" type="datetime-local" formControlName="fechaHora" />
-        </div>
-
-        <div>
-          <label for="p-glocal">Goles Local</label>
-          <input id="p-glocal" type="number" formControlName="golesLocal" min="0" />
-        </div>
-
-        <div>
-          <label for="p-gvisitante">Goles Visitante</label>
-          <input id="p-gvisitante" type="number" formControlName="golesVisitante" min="0" />
-        </div>
-
-        <div>
-          <label for="p-estado">Estado</label>
-          <select id="p-estado" formControlName="estado" aria-required="true">
-            <option value="P">Programado</option>
-            <option value="J">Jugado</option>
-            <option value="C">Cancelado</option>
-          </select>
-        </div>
-
-      </div>
-
-      <div class="buttons">
-        <button type="submit" [disabled]="loading() || form.invalid">
-          {{ loading() ? 'Guardando...' : 'Guardar' }}
-        </button>
-        <button type="button" class="secondary" (click)="cancelar()">Cancelar</button>
-      </div>
-    </form>
-
-    @if (error()) { <p class="mensaje error-text" role="alert">{{ error() }}</p> }
-    @if (success()) { <p class="mensaje" role="status">{{ success() }}</p> }
-  </section>
+      </form>
+      @if (error()) {
+        <p class="mensaje error-text" role="alert">{{ error() }}</p>
+      }
+      @if (success()) {
+        <p class="mensaje" role="status">{{ success() }}</p>
+      }
+    </section>
   }
 
   <section class="table-card">
@@ -94,9 +81,9 @@
           <th scope="col">ID</th>
           <th scope="col">Local</th>
           <th scope="col">Visitante</th>
-          <th scope="col">Resultado</th>
+          <th scope="col">Marcador</th>
           <th scope="col">Fase</th>
-          <th scope="col">Estado</th>
+          <th scope="col">Fecha</th>
           <th scope="col">Acciones</th>
         </tr>
       </thead>
@@ -107,30 +94,56 @@
             <td>{{ equipoNombre(p.idEquipoLocal) }}</td>
             <td>{{ equipoNombre(p.idEquipoVisitante) }}</td>
             <td>
-              @if (p.golesLocal != null && p.golesVisitante != null) {
-                <span class="marcador">{{ p.golesLocal }} - {{ p.golesVisitante }}</span>
+              @if (p.golesLocal !== null && p.golesVisitante !== null) {
+                <strong>{{ p.golesLocal }} - {{ p.golesVisitante }}</strong>
               } @else {
-                <span class="sin-resultado">-</span>
+                <span>Pendiente</span>
               }
             </td>
             <td>{{ p.fase }}</td>
+            <td>{{ p.fechaHora | date: 'dd/MM/yyyy HH:mm' }}</td>
             <td>
-              <span [class]="'badge badge-' + p.estado">
-                {{ p.estado === 'P' ? 'Programado' : p.estado === 'J' ? 'Jugado' : 'Cancelado' }}
-              </span>
-            </td>
-            <td>
-              <button class="small" type="button" (click)="editar(p)" [attr.aria-label]="'Editar partido ' + p.idPartido">Editar</button>
-              <button class="small danger" type="button" (click)="eliminar(p.idPartido!)" [attr.aria-label]="'Eliminar partido ' + p.idPartido">Eliminar</button>
+              @if (p.estado === 'A') {
+                <button
+                  class="small"
+                  type="button"
+                  (click)="editar(p)"
+                  [attr.aria-label]="'Editar partido ' + p.idPartido"
+                >
+                  Editar
+                </button>
+                <button
+                  class="small danger"
+                  type="button"
+                  (click)="eliminar(p.idPartido!)"
+                  [attr.aria-label]="'Eliminar partido ' + p.idPartido"
+                >
+                  Eliminar
+                </button>
+              }
             </td>
           </tr>
         }
       </tbody>
     </table>
     <div class="pagination" aria-label="Paginación de partidos">
-      <button type="button" (click)="prevPage()" [disabled]="page() === 0" aria-label="Página anterior">&#8592;</button>
+      <button
+        type="button"
+        (click)="prevPage()"
+        [disabled]="page() === 0"
+        aria-label="Página anterior"
+      >
+        &#8592;
+      </button>
       <span>{{ page() + 1 }} / {{ totalPages() }}</span>
-      <button type="button" (click)="nextPage()" [disabled]="page() === totalPages() - 1" aria-label="Página siguiente">&#8594;</button>
+      <button
+        type="button"
+        (click)="nextPage()"
+        [disabled]="page() === totalPages() - 1"
+        aria-label="Página siguiente"
+      >
+        &#8594;
+      </button>
     </div>
   </section>
 </div>

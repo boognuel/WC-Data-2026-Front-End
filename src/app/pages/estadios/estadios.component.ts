@@ -1,21 +1,18 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
 import { EstadioService } from '../../services/estadio.service';
 import { EstadioDTO } from '../../models/estadio.model';
 
 @Component({
   selector: 'app-estadios',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule],
   templateUrl: './estadios.component.html',
   styleUrl: './estadios.component.css'
 })
 export class EstadiosComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly estadioService = inject(EstadioService);
-  private readonly auth = inject(AuthService);
 
   readonly estadios = signal<EstadioDTO[]>([]);
   readonly selectedFile = signal<File | null>(null);
@@ -27,8 +24,12 @@ export class EstadiosComponent implements OnInit {
   readonly loading = signal(false);
   readonly page = signal(0);
   readonly pageSize = 10;
-  readonly paginados = computed(() => this.estadios().slice(this.page() * this.pageSize, (this.page() + 1) * this.pageSize));
-  readonly totalPages = computed(() => Math.ceil(this.estadios().length / this.pageSize));
+  readonly paginados = computed(() =>
+    this.estadios().slice(this.page() * this.pageSize, (this.page() + 1) * this.pageSize)
+  );
+  readonly totalPages = computed(() =>
+    Math.max(1, Math.ceil(this.estadios().length / this.pageSize))
+  );
 
   readonly form = this.fb.group({
     idEstadio: [null as number | null],
@@ -68,9 +69,6 @@ export class EstadiosComponent implements OnInit {
     this.form.patchValue({ idEstadio: e.idEstadio ?? null, descripcion: e.descripcion, imagen: e.imagen ?? '', estado: e.estado });
   }
 
-  nextPage(): void { if (this.page() < this.totalPages() - 1) this.page.update(p => p + 1); }
-  prevPage(): void { if (this.page() > 0) this.page.update(p => p - 1); }
-
   eliminar(id: number): void {
     if (!window.confirm('¿Está seguro que desea eliminar este estadio?')) return;
     this.estadioService.delete(id).subscribe({
@@ -78,6 +76,9 @@ export class EstadiosComponent implements OnInit {
       error: () => this.error.set('Error al eliminar')
     });
   }
+
+  nextPage(): void { if (this.page() < this.totalPages() - 1) this.page.update(p => p + 1); }
+  prevPage(): void { if (this.page() > 0) this.page.update(p => p - 1); }
 
   onFileChange(event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0] ?? null;
@@ -94,6 +95,4 @@ export class EstadiosComponent implements OnInit {
     this.error.set(null);
     this.success.set(null);
   }
-
-  salir(): void { this.auth.logout(); }
 }

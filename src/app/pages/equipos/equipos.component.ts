@@ -1,21 +1,18 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
 import { EquipoService } from '../../services/equipo.service';
 import { EquipoDTO } from '../../models/equipo.model';
 
 @Component({
   selector: 'app-equipos',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule],
   templateUrl: './equipos.component.html',
   styleUrl: './equipos.component.css'
 })
 export class EquiposComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly equipoService = inject(EquipoService);
-  private readonly auth = inject(AuthService);
 
   readonly equipos = signal<EquipoDTO[]>([]);
   readonly selectedFile = signal<File | null>(null);
@@ -27,8 +24,12 @@ export class EquiposComponent implements OnInit {
   readonly loading = signal(false);
   readonly page = signal(0);
   readonly pageSize = 10;
-  readonly paginados = computed(() => this.equipos().slice(this.page() * this.pageSize, (this.page() + 1) * this.pageSize));
-  readonly totalPages = computed(() => Math.ceil(this.equipos().length / this.pageSize));
+  readonly paginados = computed(() =>
+    this.equipos().slice(this.page() * this.pageSize, (this.page() + 1) * this.pageSize)
+  );
+  readonly totalPages = computed(() =>
+    Math.max(1, Math.ceil(this.equipos().length / this.pageSize))
+  );
 
   readonly form = this.fb.group({
     idEquipo: [null as number | null],
@@ -37,16 +38,13 @@ export class EquiposComponent implements OnInit {
     entrenador: ['', Validators.required],
     estado: ['A'],
     bandera: [''],
-    externalId: ['']
   });
 
-  ngOnInit(): void {
-    this.cargar();
-  }
+  ngOnInit(): void { this.cargar(); }
 
   cargar(): void {
     this.equipoService.getAll().subscribe({
-      next: (data) => this.equipos.set(data),
+      next: data => this.equipos.set(data),
       error: () => this.error.set('Error al cargar equipos')
     });
   }
@@ -64,7 +62,7 @@ export class EquiposComponent implements OnInit {
         this.cancelar();
         this.cargar();
       },
-      error: (err) => {
+      error: err => {
         this.loading.set(false);
         this.error.set(typeof err.error === 'string' ? err.error : 'Error al guardar equipo');
       }
@@ -84,8 +82,7 @@ export class EquiposComponent implements OnInit {
       idGrupo: e.idGrupo,
       entrenador: e.entrenador,
       estado: e.estado,
-      bandera: e.bandera ?? '',
-      externalId: e.externalId ?? ''
+      bandera: e.bandera ?? ''
     });
   }
 
@@ -94,11 +91,7 @@ export class EquiposComponent implements OnInit {
     this.error.set(null);
     this.success.set(null);
     this.equipoService.delete(id).subscribe({
-      next: () => {
-        this.success.set('Equipo eliminado');
-        this.page.set(0);
-        this.cargar();
-      },
+      next: () => { this.success.set('Equipo eliminado'); this.page.set(0); this.cargar(); },
       error: () => this.error.set('Error al eliminar equipo')
     });
   }
@@ -107,12 +100,11 @@ export class EquiposComponent implements OnInit {
   prevPage(): void { if (this.page() > 0) this.page.update(p => p - 1); }
 
   onFileChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0] ?? null;
+    const file = (event.target as HTMLInputElement).files?.[0] ?? null;
     this.selectedFile.set(file);
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => this.previewUrl.set(e.target?.result as string);
+      reader.onload = e => this.previewUrl.set(e.target?.result as string);
       reader.readAsDataURL(file);
     } else {
       this.previewUrl.set(null);
@@ -126,9 +118,5 @@ export class EquiposComponent implements OnInit {
     this.previewUrl.set(null);
     this.error.set(null);
     this.success.set(null);
-  }
-
-  salir(): void {
-    this.auth.logout();
   }
 }

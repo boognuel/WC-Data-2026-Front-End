@@ -212,3 +212,38 @@ tr:hover td {
         grid-template-columns: 1fr;
     }
 }
+
+.badge-activo {
+    background: #1a4d1a;
+    color: #5dfc5d;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+}
+
+.badge-inactivo {
+    background: #4d1a1a;
+    color: #fc5d5d;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+}
+
+.bloqueado td {
+    opacity: 0.6;
+}
+
+button.warn {
+    background: #7a4a00;
+    color: #ffb347;
+    border: 1px solid #ffb347;
+    border-radius: 5px;
+    padding: 3px 8px;
+    cursor: pointer;
+    font-size: 0.78rem;
+}
+
+button.warn:hover {
+    background: #ffb347;
+    color: #000;
+}

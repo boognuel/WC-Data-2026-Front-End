@@ -1,74 +1,68 @@
 <div class="layout">
   <header>
     <h1>Equipos</h1>
-    <div class="header-actions">
-      <a routerLink="/jugadores" class="btn-link">Jugadores</a>
-      <button type="button" (click)="abrirNuevo()">Nuevo</button>
-      <button class="logout" type="button" (click)="salir()">Cerrar sesión</button>
-    </div>
+    <button type="button" (click)="abrirNuevo()">Nuevo</button>
   </header>
 
   @if (showForm()) {
-  <section class="form-card">
-    <h2>{{ editMode() ? 'Editar equipo' : 'Nuevo equipo' }}</h2>
+    <section class="form-card">
+      <h2>{{ editMode() ? 'Editar equipo' : 'Nuevo equipo' }}</h2>
 
-    <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
-      <div class="grid">
-
-        <div>
-          <label for="eq-nombre">Nombre</label>
-          <input id="eq-nombre" type="text" formControlName="nombre" aria-required="true" />
-        </div>
-
-        <div>
-          <label for="eq-grupo">Grupo</label>
-          <input id="eq-grupo" type="text" formControlName="idGrupo" aria-required="true" />
-        </div>
-
-        <div>
-          <label for="eq-entrenador">Entrenador</label>
-          <input id="eq-entrenador" type="text" formControlName="entrenador" aria-required="true" />
-        </div>
-
-        <div>
-          <label for="eq-external">ID externo</label>
-          <input id="eq-external" type="text" formControlName="externalId" />
-        </div>
-
-        <div>
-          <label for="eq-bandera">Bandera (imagen)</label>
-          <input
-            id="eq-bandera"
-            type="file"
-            accept="image/*"
-            (change)="onFileChange($event)"
-            aria-label="Seleccionar imagen de bandera"
-          />
-        </div>
-
-        @if (previewUrl()) {
-          <div class="preview-cell">
-            <img [src]="previewUrl()!" alt="Vista previa bandera" class="preview-img" />
+      <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+        <div class="grid">
+          <div>
+            <label for="eq-nombre">Nombre</label>
+            <input id="eq-nombre" type="text" formControlName="nombre" aria-required="true" />
           </div>
-        }
 
-      </div>
+          <div>
+            <label for="eq-grupo">Grupo</label>
+            <input id="eq-grupo" type="text" formControlName="idGrupo" aria-required="true" />
+          </div>
 
-      <div class="buttons">
-        <button type="submit" [disabled]="loading() || form.invalid">
-          {{ loading() ? 'Guardando...' : 'Guardar' }}
-        </button>
-        <button type="button" class="secondary" (click)="cancelar()">Cancelar</button>
-      </div>
-    </form>
+          <div>
+            <label for="eq-entrenador">Entrenador</label>
+            <input
+              id="eq-entrenador"
+              type="text"
+              formControlName="entrenador"
+              aria-required="true"
+            />
+          </div>
 
-    @if (error()) {
-      <p class="mensaje error-text" role="alert">{{ error() }}</p>
-    }
-    @if (success()) {
-      <p class="mensaje" role="status">{{ success() }}</p>
-    }
-  </section>
+          <div>
+            <label for="eq-bandera">Bandera (imagen)</label>
+            <input
+              id="eq-bandera"
+              type="file"
+              accept="image/*"
+              (change)="onFileChange($event)"
+              aria-label="Seleccionar imagen de bandera"
+            />
+          </div>
+
+          @if (previewUrl()) {
+            <div class="preview-cell">
+              <img [src]="previewUrl()!" alt="Vista previa bandera" class="preview-img" />
+            </div>
+          }
+        </div>
+
+        <div class="buttons">
+          <button type="submit" [disabled]="loading() || form.invalid">
+            {{ loading() ? 'Guardando...' : 'Guardar' }}
+          </button>
+          <button type="button" class="secondary" (click)="cancelar()">Cancelar</button>
+        </div>
+      </form>
+
+      @if (error()) {
+        <p class="mensaje error-text" role="alert">{{ error() }}</p>
+      }
+      @if (success()) {
+        <p class="mensaje" role="status">{{ success() }}</p>
+      }
+    </section>
   }
 
   <section class="table-card">
@@ -99,18 +93,47 @@
             </td>
             <td>
               @if (e.estado === 'A') {
-                <button class="small" type="button" [attr.aria-label]="'Editar ' + e.nombre" (click)="editar(e)">Editar</button>
-                <button class="small danger" type="button" [attr.aria-label]="'Eliminar ' + e.nombre" (click)="eliminar(e.idEquipo!)">Eliminar</button>
+                <button
+                  class="small"
+                  type="button"
+                  [attr.aria-label]="'Editar ' + e.nombre"
+                  (click)="editar(e)"
+                >
+                  Editar
+                </button>
+                <button
+                  class="small danger"
+                  type="button"
+                  [attr.aria-label]="'Eliminar ' + e.nombre"
+                  (click)="eliminar(e.idEquipo!)"
+                >
+                  Eliminar
+                </button>
               }
             </td>
           </tr>
         }
       </tbody>
     </table>
+
     <div class="pagination" aria-label="Paginación de equipos">
-      <button type="button" (click)="prevPage()" [disabled]="page() === 0" aria-label="Página anterior">&#8592;</button>
+      <button
+        type="button"
+        (click)="prevPage()"
+        [disabled]="page() === 0"
+        aria-label="Página anterior"
+      >
+        &#8592;
+      </button>
       <span>{{ page() + 1 }} / {{ totalPages() }}</span>
-      <button type="button" (click)="nextPage()" [disabled]="page() === totalPages() - 1" aria-label="Página siguiente">&#8594;</button>
+      <button
+        type="button"
+        (click)="nextPage()"
+        [disabled]="page() === totalPages() - 1"
+        aria-label="Página siguiente"
+      >
+        &#8594;
+      </button>
     </div>
   </section>
 </div>

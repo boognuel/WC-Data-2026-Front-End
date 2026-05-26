@@ -3,7 +3,7 @@ export interface ParametroDTO {
   descripcion: string;
   valorTexto: string;
   valorNumero?: number | null;
-  fechaInicial?: string;
-  fechaFinal?: string;
+  fechaInicial?: Date | null;
+  fechaFinal?: Date | null;
   estado: string;
 }

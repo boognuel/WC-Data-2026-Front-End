@@ -1,40 +1,48 @@
 <div class="layout">
   <header>
     <h1>Estadios</h1>
-    <div class="header-actions">
-      <a routerLink="/equipos" class="btn-link">Equipos</a>
-      <button type="button" (click)="abrirNuevo()">Nuevo</button>
-      <button class="logout" type="button" (click)="salir()">Cerrar sesión</button>
-    </div>
+    <button type="button" (click)="abrirNuevo()">Nuevo</button>
   </header>
 
   @if (showForm()) {
-  <section class="form-card">
-    <h2>{{ editMode() ? 'Editar estadio' : 'Nuevo estadio' }}</h2>
-    <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
-      <div class="grid">
-        <div>
-          <label for="est-desc">Descripción</label>
-          <input id="est-desc" type="text" formControlName="descripcion" aria-required="true" />
-        </div>
-        <div>
-          <label for="est-img">Imagen</label>
-          <input id="est-img" type="file" accept="image/*" (change)="onFileChange($event)" aria-label="Imagen del estadio" />
-        </div>
-        @if (previewUrl()) {
-          <div class="preview-cell">
-            <img [src]="previewUrl()!" alt="Vista previa estadio" class="preview-img" />
+    <section class="form-card">
+      <h2>{{ editMode() ? 'Editar estadio' : 'Nuevo estadio' }}</h2>
+      <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+        <div class="grid">
+          <div>
+            <label for="est-desc">Descripción</label>
+            <input id="est-desc" type="text" formControlName="descripcion" aria-required="true" />
           </div>
-        }
-      </div>
-      <div class="buttons">
-        <button type="submit" [disabled]="loading() || form.invalid">{{ loading() ? 'Guardando...' : 'Guardar' }}</button>
-        <button type="button" class="secondary" (click)="cancelar()">Cancelar</button>
-      </div>
-    </form>
-    @if (error()) { <p class="mensaje error-text" role="alert">{{ error() }}</p> }
-    @if (success()) { <p class="mensaje" role="status">{{ success() }}</p> }
-  </section>
+          <div>
+            <label for="est-img">Imagen</label>
+            <input
+              id="est-img"
+              type="file"
+              accept="image/*"
+              (change)="onFileChange($event)"
+              aria-label="Imagen del estadio"
+            />
+          </div>
+          @if (previewUrl()) {
+            <div class="preview-cell">
+              <img [src]="previewUrl()!" alt="Vista previa estadio" class="preview-img" />
+            </div>
+          }
+        </div>
+        <div class="buttons">
+          <button type="submit" [disabled]="loading() || form.invalid">
+            {{ loading() ? 'Guardando...' : 'Guardar' }}
+          </button>
+          <button type="button" class="secondary" (click)="cancelar()">Cancelar</button>
+        </div>
+      </form>
+      @if (error()) {
+        <p class="mensaje error-text" role="alert">{{ error() }}</p>
+      }
+      @if (success()) {
+        <p class="mensaje" role="status">{{ success() }}</p>
+      }
+    </section>
   }
 
   <section class="table-card">
@@ -53,11 +61,29 @@
           <tr>
             <td>{{ e.idEstadio }}</td>
             <td>{{ e.descripcion }}</td>
-            <td>@if (e.imagen) { <img [src]="e.imagen" [alt]="e.descripcion" class="thumb" /> }</td>
+            <td>
+              @if (e.imagen) {
+                <img [src]="e.imagen" [alt]="e.descripcion" class="thumb" />
+              }
+            </td>
             <td>
               @if (e.estado === 'A') {
-                <button class="small" type="button" (click)="editar(e)" [attr.aria-label]="'Editar ' + e.descripcion">Editar</button>
-                <button class="small danger" type="button" (click)="eliminar(e.idEstadio!)" [attr.aria-label]="'Eliminar ' + e.descripcion">Eliminar</button>
+                <button
+                  class="small"
+                  type="button"
+                  (click)="editar(e)"
+                  [attr.aria-label]="'Editar ' + e.descripcion"
+                >
+                  Editar
+                </button>
+                <button
+                  class="small danger"
+                  type="button"
+                  (click)="eliminar(e.idEstadio!)"
+                  [attr.aria-label]="'Eliminar ' + e.descripcion"
+                >
+                  Eliminar
+                </button>
               }
             </td>
           </tr>
@@ -65,9 +91,23 @@
       </tbody>
     </table>
     <div class="pagination" aria-label="Paginación de estadios">
-      <button type="button" (click)="prevPage()" [disabled]="page() === 0" aria-label="Página anterior">&#8592;</button>
+      <button
+        type="button"
+        (click)="prevPage()"
+        [disabled]="page() === 0"
+        aria-label="Página anterior"
+      >
+        &#8592;
+      </button>
       <span>{{ page() + 1 }} / {{ totalPages() }}</span>
-      <button type="button" (click)="nextPage()" [disabled]="page() === totalPages() - 1" aria-label="Página siguiente">&#8594;</button>
+      <button
+        type="button"
+        (click)="nextPage()"
+        [disabled]="page() === totalPages() - 1"
+        aria-label="Página siguiente"
+      >
+        &#8594;
+      </button>
     </div>
   </section>
 </div>

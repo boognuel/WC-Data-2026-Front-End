@@ -5,6 +5,6 @@ export interface PartidoDTO {
   fase: string;
   golesLocal?: number | null;
   golesVisitante?: number | null;
-  fechaHora?: string;
+  fechaHora?: Date | null;
   estado: string;
 }

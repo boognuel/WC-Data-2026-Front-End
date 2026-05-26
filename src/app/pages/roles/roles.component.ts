@@ -1,21 +1,18 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
 import { RolService } from '../../services/rol.service';
 import { RolDTO } from '../../models/rol.model';
 
 @Component({
     selector: 'app-roles',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [ReactiveFormsModule, RouterLink],
+    imports: [ReactiveFormsModule],
     templateUrl: './roles.component.html',
     styleUrl: './roles.component.css'
 })
 export class RolesComponent implements OnInit {
     private readonly fb = inject(FormBuilder);
     private readonly rolService = inject(RolService);
-    private readonly auth = inject(AuthService);
 
     readonly roles = signal<RolDTO[]>([]);
     readonly editMode = signal(false);
@@ -25,8 +22,12 @@ export class RolesComponent implements OnInit {
     readonly loading = signal(false);
     readonly page = signal(0);
     readonly pageSize = 10;
-    readonly paginados = computed(() => this.roles().slice(this.page() * this.pageSize, (this.page() + 1) * this.pageSize));
-    readonly totalPages = computed(() => Math.ceil(this.roles().length / this.pageSize));
+    readonly paginados = computed(() =>
+        this.roles().slice(this.page() * this.pageSize, (this.page() + 1) * this.pageSize)
+    );
+    readonly totalPages = computed(() =>
+        Math.max(1, Math.ceil(this.roles().length / this.pageSize))
+    );
 
     readonly form = this.fb.group({
         idRol: [null as number | null],
@@ -50,16 +51,8 @@ export class RolesComponent implements OnInit {
         this.success.set(null);
         const dto = this.form.value as RolDTO;
         this.rolService.save(dto).subscribe({
-            next: () => {
-                this.loading.set(false);
-                this.success.set('Rol guardado correctamente');
-                this.cancelar();
-                this.cargar();
-            },
-            error: err => {
-                this.loading.set(false);
-                this.error.set(typeof err.error === 'string' ? err.error : 'Error al guardar rol');
-            }
+            next: () => { this.loading.set(false); this.success.set('Rol guardado'); this.cancelar(); this.cargar(); },
+            error: err => { this.loading.set(false); this.error.set(err.error ?? 'Error al guardar rol'); }
         });
     }
 
@@ -72,18 +65,16 @@ export class RolesComponent implements OnInit {
         this.form.patchValue({ idRol: r.idRol ?? null, nombreRol: r.nombreRol, estado: r.estado });
     }
 
-    nextPage(): void { if (this.page() < this.totalPages() - 1) this.page.update(p => p + 1); }
-    prevPage(): void { if (this.page() > 0) this.page.update(p => p - 1); }
-
     eliminar(id: number): void {
         if (!window.confirm('¿Está seguro que desea eliminar este rol?')) return;
-        this.error.set(null);
-        this.success.set(null);
         this.rolService.delete(id).subscribe({
             next: () => { this.success.set('Rol eliminado'); this.cargar(); },
             error: () => this.error.set('Error al eliminar rol')
         });
     }
+
+    nextPage(): void { if (this.page() < this.totalPages() - 1) this.page.update(p => p + 1); }
+    prevPage(): void { if (this.page() > 0) this.page.update(p => p - 1); }
 
     limpiar(): void {
         this.form.reset({ estado: 'A' });
@@ -91,6 +82,4 @@ export class RolesComponent implements OnInit {
         this.error.set(null);
         this.success.set(null);
     }
-
-    salir(): void { this.auth.logout(); }
 }
