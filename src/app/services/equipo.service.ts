@@ -6,7 +6,7 @@ import { EquipoDTO } from '../models/equipo.model';
 @Injectable({ providedIn: 'root' })
 export class EquipoService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:114/Mundial2026_V1/equipo';
+  private readonly baseUrl = 'http://localhost:8114/Mundial2026_V1/equipo';
 
   getAll(): Observable<EquipoDTO[]> {
     return this.http.get<EquipoDTO[]>(`${this.baseUrl}/getAll`);

@@ -1,0 +1,58 @@
+<div class="login-container">
+  <div class="login-card">
+    <h2>Registro</h2>
+    <p>Crea tu cuenta de usuario externo</p>
+
+    <form [formGroup]="form" (ngSubmit)="registrar()" novalidate>
+      <label for="r-username">Usuario (correo)</label>
+      <input
+        id="r-username"
+        type="email"
+        formControlName="username"
+        placeholder="usuario@correo.com"
+        autocomplete="username"
+        aria-required="true"
+      />
+
+      <label for="r-email">Correo electrónico</label>
+      <input
+        id="r-email"
+        type="email"
+        formControlName="email"
+        placeholder="correo@ejemplo.com"
+        aria-required="true"
+      />
+
+      <label for="r-nombre">Nombre y apellido</label>
+      <input
+        id="r-nombre"
+        type="text"
+        formControlName="nombreapellido"
+        placeholder="Nombre completo"
+        aria-required="true"
+      />
+
+      <label for="r-pass">Contraseña</label>
+      <input
+        id="r-pass"
+        type="password"
+        formControlName="password"
+        placeholder="6-8 chars, mayúsc, minúsc, número"
+        aria-required="true"
+      />
+
+      @if (error()) {
+        <div class="error" role="alert">{{ error() }}</div>
+      }
+      @if (success()) {
+        <div class="success" role="status">{{ success() }}</div>
+      }
+
+      <button type="submit" [disabled]="loading() || form.invalid">
+        {{ loading() ? 'Registrando...' : 'Registrarse' }}
+      </button>
+    </form>
+
+    <p class="link-text">¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a></p>
+  </div>
+</div>

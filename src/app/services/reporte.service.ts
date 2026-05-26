@@ -6,7 +6,7 @@ import { EstadisticaDTO } from '../models/estadistica.model';
 @Injectable({ providedIn: 'root' })
 export class ReporteService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:114/Mundial2026_V1/reporte';
+  private readonly baseUrl = 'http://localhost:8114/Mundial2026_V1/reporte';
 
   getEstadisticas(): Observable<EstadisticaDTO[]> {
     return this.http.get<EstadisticaDTO[]>(`${this.baseUrl}/estadisticas/tabla`);

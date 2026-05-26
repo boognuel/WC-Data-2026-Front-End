@@ -1,0 +1,60 @@
+<div class="shell">
+  <aside class="sidebar" [class.collapsed]="collapsed()">
+    <div class="sb-header">
+      <span class="sb-logo">⚽</span>
+      @if (!collapsed()) {
+        <span class="sb-brand">Mundial 2026</span>
+      }
+      <button
+        class="sb-toggle"
+        type="button"
+        (click)="toggleSidebar()"
+        [attr.aria-label]="collapsed() ? 'Expandir menú' : 'Colapsar menú'"
+      >
+        {{ collapsed() ? '›' : '‹' }}
+      </button>
+    </div>
+
+    <nav class="sb-nav" aria-label="Menú principal">
+      @for (item of visibleNav(); track item.route) {
+        <a
+          class="sb-item"
+          [routerLink]="item.route"
+          routerLinkActive="sb-active"
+          [title]="item.label"
+          [attr.aria-label]="item.label"
+        >
+          <span class="sb-icon">{{ item.icon }}</span>
+          @if (!collapsed()) {
+            <span class="sb-label">{{ item.label }}</span>
+          }
+        </a>
+      }
+    </nav>
+
+    <div class="sb-footer">
+      @if (!collapsed()) {
+        <div class="sb-user">
+          <span class="sb-username">{{ userName() }}</span>
+          <span class="sb-role">{{ roleName() }}</span>
+        </div>
+      }
+      <button
+        class="sb-logout"
+        type="button"
+        (click)="logout()"
+        title="Cerrar sesión"
+        aria-label="Cerrar sesión"
+      >
+        <span class="sb-icon">🚪</span>
+        @if (!collapsed()) {
+          <span>Cerrar sesión</span>
+        }
+      </button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <router-outlet />
+  </main>
+</div>

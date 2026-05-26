@@ -6,6 +6,7 @@ export interface UsuarioResponseDTO {
   estado: string;
   intentos?: number;
   fechaUltClave?: Date;
+  email?: string;
 }
 
 export interface UsuarioRequestDTO {
@@ -14,4 +15,5 @@ export interface UsuarioRequestDTO {
   password: string;
   nombreapellido: string;
   idRol: number;
+  email?: string;
 }

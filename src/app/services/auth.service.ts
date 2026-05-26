@@ -3,7 +3,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { UsuarioRequest, UsuarioResponse } from '../models/usuario.model';
+import { UsuarioResponseDTO } from '../models/usuario.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -11,21 +11,23 @@ export class AuthService {
   private readonly router = inject(Router);
   private readonly platformId = inject(PLATFORM_ID);
 
-  private readonly baseUrl = 'http://localhost:114/Mundial2026_V1/usuario';
+  private readonly baseUrl = 'http://localhost:8114/Mundial2026_V1/usuario';
 
-  readonly currentUser = signal<UsuarioResponse | null>(this.loadUser());
+  readonly currentUser = signal<UsuarioResponseDTO | null>(this.loadUser());
 
-  private loadUser(): UsuarioResponse | null {
+  private loadUser(): UsuarioResponseDTO | null {
     if (!isPlatformBrowser(this.platformId)) return null;
     const raw = localStorage.getItem('wc_user');
     return raw ? JSON.parse(raw) : null;
   }
 
-  login(credentials: UsuarioRequest): Observable<HttpResponse<UsuarioResponse>> {
-    return this.http.post<UsuarioResponse>(`${this.baseUrl}/login`, credentials, { observe: 'response' });
+  login(credentials: { username: string; password: string }): Observable<HttpResponse<UsuarioResponseDTO>> {
+    return this.http.post<UsuarioResponseDTO>(
+      `${this.baseUrl}/login`, credentials, { observe: 'response' }
+    );
   }
 
-  setUser(user: UsuarioResponse): void {
+  setUser(user: UsuarioResponseDTO): void {
     if (isPlatformBrowser(this.platformId)) {
       localStorage.setItem('wc_user', JSON.stringify(user));
     }
@@ -40,10 +42,7 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
-  isLoggedIn(): boolean {
-    return this.currentUser() !== null;
-  }
-
+  isLoggedIn(): boolean { return this.currentUser() !== null; }
   isAdmin(): boolean {
     const u = this.currentUser();
     return u !== null && u.idRol === 1;

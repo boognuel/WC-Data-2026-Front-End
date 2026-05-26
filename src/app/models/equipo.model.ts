@@ -5,5 +5,4 @@ export interface EquipoDTO {
   entrenador: string;
   estado: string;
   bandera?: string;
-  externalId?: string;
 }
