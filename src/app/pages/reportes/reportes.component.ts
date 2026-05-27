@@ -3,7 +3,6 @@ import {
   signal, ViewChild, ElementRef, effect, PLATFORM_ID, OnDestroy
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ReporteService } from '../../services/reporte.service';
 import { PartidoService } from '../../services/partido.service';
@@ -20,7 +19,6 @@ Chart.register(BarController, BarElement, CategoryScale, LinearScale,
 @Component({
   selector: 'app-reportes',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink],
   templateUrl: './reportes.component.html',
   styleUrl: './reportes.component.css'
 })

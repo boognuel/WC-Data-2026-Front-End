@@ -1,139 +1,113 @@
-<div class="layout">
-  <header>
-    <h1>Equipos</h1>
-    <button type="button" (click)="abrirNuevo()">Nuevo</button>
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h1>Selecciones <span class="subtitle">— Fase de Grupos</span></h1>
+    </div>
+    <button class="btn-primary" type="button" (click)="abrirNuevo()">＋ Nueva selección</button>
   </header>
+
+  <div class="filter-bar">
+    <div class="group-tabs">
+      <button
+        type="button"
+        class="tab"
+        [class.active]="grupoFiltro() === 'TODOS'"
+        (click)="setGrupoFiltro('TODOS')"
+      >Todos</button>
+      @for (g of grupos(); track g) {
+        <button
+          type="button"
+          class="tab"
+          [class.active]="grupoFiltro() === g"
+          (click)="setGrupoFiltro(g)"
+        >Gr. {{ g }}</button>
+      }
+    </div>
+    <div class="search">
+      <span class="search-icon">🔍</span>
+      <input
+        type="search"
+        placeholder="Buscar..."
+        [value]="busqueda()"
+        (input)="onBuscar($event)"
+        aria-label="Buscar selección"
+      />
+    </div>
+  </div>
 
   @if (showForm()) {
     <section class="form-card">
-      <h2>{{ editMode() ? 'Editar equipo' : 'Nuevo equipo' }}</h2>
-
+      <h2>{{ editMode() ? 'Editar selección' : 'Nueva selección' }}</h2>
       <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
         <div class="grid">
           <div>
             <label for="eq-nombre">Nombre</label>
             <input id="eq-nombre" type="text" formControlName="nombre" aria-required="true" />
           </div>
-
           <div>
             <label for="eq-grupo">Grupo</label>
-            <input id="eq-grupo" type="text" formControlName="idGrupo" aria-required="true" />
+            <input id="eq-grupo" type="text" formControlName="idGrupo" maxlength="1" aria-required="true" />
           </div>
-
           <div>
             <label for="eq-entrenador">Entrenador</label>
-            <input
-              id="eq-entrenador"
-              type="text"
-              formControlName="entrenador"
-              aria-required="true"
-            />
+            <input id="eq-entrenador" type="text" formControlName="entrenador" aria-required="true" />
           </div>
-
           <div>
-            <label for="eq-bandera">Bandera (imagen)</label>
-            <input
-              id="eq-bandera"
-              type="file"
-              accept="image/*"
-              (change)="onFileChange($event)"
-              aria-label="Seleccionar imagen de bandera"
-            />
+            <label for="eq-bandera">Bandera</label>
+            <input id="eq-bandera" type="file" accept="image/*" (change)="onFileChange($event)" />
           </div>
-
           @if (previewUrl()) {
             <div class="preview-cell">
-              <img [src]="previewUrl()!" alt="Vista previa bandera" class="preview-img" />
+              <img [src]="previewUrl()!" alt="Vista previa" class="preview-img" referrerpolicy="no-referrer" />
             </div>
           }
         </div>
-
         <div class="buttons">
-          <button type="submit" [disabled]="loading() || form.invalid">
+          <button class="btn-primary" type="submit" [disabled]="loading() || form.invalid">
             {{ loading() ? 'Guardando...' : 'Guardar' }}
           </button>
-          <button type="button" class="secondary" (click)="cancelar()">Cancelar</button>
+          <button class="btn-secondary" type="button" (click)="cancelar()">Cancelar</button>
         </div>
       </form>
-
-      @if (error()) {
-        <p class="mensaje error-text" role="alert">{{ error() }}</p>
-      }
-      @if (success()) {
-        <p class="mensaje" role="status">{{ success() }}</p>
-      }
+      @if (error()) { <p class="msg error" role="alert">{{ error() }}</p> }
+      @if (success()) { <p class="msg success" role="status">{{ success() }}</p> }
     </section>
   }
 
-  <section class="table-card">
-    <h2>Lista de equipos</h2>
+  @if (error() && !showForm()) { <p class="msg error" role="alert">{{ error() }}</p> }
+  @if (success() && !showForm()) { <p class="msg success" role="status">{{ success() }}</p> }
 
-    <table aria-label="Tabla de equipos">
-      <thead>
-        <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Nombre</th>
-          <th scope="col">Grupo</th>
-          <th scope="col">Entrenador</th>
-          <th scope="col">Bandera</th>
-          <th scope="col">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (e of paginados(); track e.idEquipo) {
-          <tr>
-            <td>{{ e.idEquipo }}</td>
-            <td>{{ e.nombre }}</td>
-            <td>{{ e.idGrupo }}</td>
-            <td>{{ e.entrenador }}</td>
-            <td>
+  <div class="cards-grid">
+    @for (e of filtrados(); track e.idEquipo) {
+      <article class="team-card" [class.inactivo]="e.estado === 'I'">
+        <div class="pos-bar" [class]="posColor(e.posicionGrupo)"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <div class="flag-wrap">
               @if (e.bandera) {
-                <img [src]="e.bandera" [alt]="'Bandera ' + e.nombre" class="thumb" />
+                <img [src]="e.bandera" [alt]="'Bandera ' + e.nombre" class="flag" referrerpolicy="no-referrer" />
+              } @else {
+                <div class="flag flag-placeholder"></div>
               }
-            </td>
-            <td>
-              @if (e.estado === 'A') {
-                <button
-                  class="small"
-                  type="button"
-                  [attr.aria-label]="'Editar ' + e.nombre"
-                  (click)="editar(e)"
-                >
-                  Editar
-                </button>
-                <button
-                  class="small danger"
-                  type="button"
-                  [attr.aria-label]="'Eliminar ' + e.nombre"
-                  (click)="eliminar(e.idEquipo!)"
-                >
-                  Eliminar
-                </button>
-              }
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
-
-    <div class="pagination" aria-label="Paginación de equipos">
-      <button
-        type="button"
-        (click)="prevPage()"
-        [disabled]="page() === 0"
-        aria-label="Página anterior"
-      >
-        &#8592;
-      </button>
-      <span>{{ page() + 1 }} / {{ totalPages() }}</span>
-      <button
-        type="button"
-        (click)="nextPage()"
-        [disabled]="page() === totalPages() - 1"
-        aria-label="Página siguiente"
-      >
-        &#8594;
-      </button>
-    </div>
-  </section>
+            </div>
+            <div class="info">
+              <h3>{{ e.nombre }}</h3>
+              <span class="group-badge">G{{ e.idGrupo }}</span>
+            </div>
+          </div>
+          <div class="stats">
+            <strong>{{ e.puntos }} pts</strong>
+            <span>{{ e.ganados }}G {{ e.empatados }}E {{ e.perdidos }}P</span>
+          </div>
+          <div class="actions">
+            <button class="btn-mini" type="button" (click)="editar(e)">Editar</button>
+            <button class="btn-mini danger" type="button" (click)="eliminar(e.idEquipo!)">Eliminar</button>
+          </div>
+        </div>
+      </article>
+    }
+    @if (filtrados().length === 0) {
+      <p class="empty">No hay selecciones que coincidan.</p>
+    }
+  </div>
 </div>

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RolService } from '../../services/rol.service';
+import { AuthService } from '../../services/auth.service';
 import { RolDTO } from '../../models/rol.model';
 
 @Component({
@@ -13,6 +14,13 @@ import { RolDTO } from '../../models/rol.model';
 export class RolesComponent implements OnInit {
     private readonly fb = inject(FormBuilder);
     private readonly rolService = inject(RolService);
+    private readonly auth = inject(AuthService);
+
+    readonly currentRolId = computed(() => this.auth.currentUser()?.idRol ?? null);
+
+    esRolPropio(idRol: number | undefined): boolean {
+        return idRol != null && idRol === this.currentRolId();
+    }
 
     readonly roles = signal<RolDTO[]>([]);
     readonly editMode = signal(false);
@@ -60,12 +68,20 @@ export class RolesComponent implements OnInit {
     cancelar(): void { this.limpiar(); this.showForm.set(false); }
 
     editar(r: RolDTO): void {
+        if (this.esRolPropio(r.idRol)) {
+            this.error.set('No puede editar el rol al que pertenece su usuario.');
+            return;
+        }
         this.showForm.set(true);
         this.editMode.set(true);
         this.form.patchValue({ idRol: r.idRol ?? null, nombreRol: r.nombreRol, estado: r.estado });
     }
 
     eliminar(id: number): void {
+        if (this.esRolPropio(id)) {
+            this.error.set('No puede eliminar el rol al que pertenece su usuario.');
+            return;
+        }
         if (!window.confirm('¿Está seguro que desea eliminar este rol?')) return;
         this.rolService.delete(id).subscribe({
             next: () => { this.success.set('Rol eliminado'); this.cargar(); },

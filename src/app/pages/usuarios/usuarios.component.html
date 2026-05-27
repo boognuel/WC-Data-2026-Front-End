@@ -117,32 +117,36 @@
             </td>
             <td>{{ u.intentos ?? 0 }}</td>
             <td>
-              <button
-                class="small"
-                type="button"
-                (click)="editar(u)"
-                [attr.aria-label]="'Editar ' + u.username"
-              >
-                Editar
-              </button>
-              @if (u.estado === 'I') {
+              @if (!esPropio(u.idUsuario)) {
                 <button
-                  class="small warn"
+                  class="small"
                   type="button"
-                  (click)="desbloquear(u.idUsuario!)"
-                  [attr.aria-label]="'Desbloquear ' + u.username"
+                  (click)="editar(u)"
+                  [attr.aria-label]="'Editar ' + u.username"
                 >
-                  Desbloquear
+                  Editar
                 </button>
+                @if (u.estado === 'I') {
+                  <button
+                    class="small warn"
+                    type="button"
+                    (click)="desbloquear(u.idUsuario!)"
+                    [attr.aria-label]="'Desbloquear ' + u.username"
+                  >
+                    Desbloquear
+                  </button>
+                }
+                <button
+                  class="small danger"
+                  type="button"
+                  (click)="eliminar(u.idUsuario!)"
+                  [attr.aria-label]="'Eliminar ' + u.username"
+                >
+                  Eliminar
+                </button>
+              } @else {
+                <span class="self-tag">(usuario actual)</span>
               }
-              <button
-                class="small danger"
-                type="button"
-                (click)="eliminar(u.idUsuario!)"
-                [attr.aria-label]="'Eliminar ' + u.username"
-              >
-                Eliminar
-              </button>
             </td>
           </tr>
         }

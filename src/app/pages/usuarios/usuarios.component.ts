@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } 
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UsuarioService } from '../../services/usuario.service';
 import { RolService } from '../../services/rol.service';
+import { AuthService } from '../../services/auth.service';
 import { UsuarioResponseDTO, UsuarioRequestDTO } from '../../models/usuario.model';
 import { RolDTO } from '../../models/rol.model';
 
@@ -16,6 +17,13 @@ export class UsuariosComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly usuarioService = inject(UsuarioService);
   private readonly rolService = inject(RolService);
+  private readonly auth = inject(AuthService);
+
+  readonly currentUserId = computed(() => this.auth.currentUser()?.idUsuario ?? null);
+
+  esPropio(idUsuario: number | undefined): boolean {
+    return idUsuario != null && idUsuario === this.currentUserId();
+  }
 
   readonly usuarios = signal<UsuarioResponseDTO[]>([]);
   readonly roles = signal<RolDTO[]>([]);
@@ -92,6 +100,10 @@ export class UsuariosComponent implements OnInit {
   cancelar(): void { this.limpiar(); this.showForm.set(false); }
 
   editar(u: UsuarioResponseDTO): void {
+    if (this.esPropio(u.idUsuario)) {
+      this.error.set('No puede editar su propio usuario.');
+      return;
+    }
     this.showForm.set(true);
     this.editMode.set(true);
     // En edición no se cambia contraseña — se pone valor dummy para pasar validación
@@ -120,6 +132,10 @@ export class UsuariosComponent implements OnInit {
   }
 
   eliminar(id: number): void {
+    if (this.esPropio(id)) {
+      this.error.set('No puede eliminar su propio usuario.');
+      return;
+    }
     if (!window.confirm('¿Está seguro que desea eliminar este usuario?')) return;
     this.usuarioService.delete(id).subscribe({
       next: () => { this.success.set('Usuario eliminado'); this.cargar(); },

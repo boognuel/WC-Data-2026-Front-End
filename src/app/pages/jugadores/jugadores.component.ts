@@ -56,7 +56,11 @@ export class JugadoresComponent implements OnInit {
   }
 
   cargarEquipos(): void {
-    this.equipoService.getAll().subscribe({ next: data => this.equipos.set(data) });
+    this.equipoService.getAll().subscribe({
+      next: data => this.equipos.set(
+        [...data].sort((a, b) => (a.nombre ?? '').localeCompare(b.nombre ?? '', 'es'))
+      )
+    });
   }
 
   guardar(): void {

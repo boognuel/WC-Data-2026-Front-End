@@ -55,22 +55,26 @@
             <td>{{ r.nombreRol }}</td>
             <td>{{ r.estado === 'A' ? 'Activo' : 'Inactivo' }}</td>
             <td>
-              <button
-                class="small"
-                type="button"
-                (click)="editar(r)"
-                [attr.aria-label]="'Editar ' + r.nombreRol"
-              >
-                Editar
-              </button>
-              <button
-                class="small danger"
-                type="button"
-                (click)="eliminar(r.idRol!)"
-                [attr.aria-label]="'Eliminar ' + r.nombreRol"
-              >
-                Eliminar
-              </button>
+              @if (!esRolPropio(r.idRol)) {
+                <button
+                  class="small"
+                  type="button"
+                  (click)="editar(r)"
+                  [attr.aria-label]="'Editar ' + r.nombreRol"
+                >
+                  Editar
+                </button>
+                <button
+                  class="small danger"
+                  type="button"
+                  (click)="eliminar(r.idRol!)"
+                  [attr.aria-label]="'Eliminar ' + r.nombreRol"
+                >
+                  Eliminar
+                </button>
+              } @else {
+                <span class="self-tag">(rol actual)</span>
+              }
             </td>
           </tr>
         }

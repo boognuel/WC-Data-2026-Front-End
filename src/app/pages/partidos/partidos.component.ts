@@ -6,6 +6,12 @@ import { EquipoService } from '../../services/equipo.service';
 import { PartidoDTO } from '../../models/partido.model';
 import { EquipoDTO } from '../../models/equipo.model';
 
+interface DiaInfo {
+  iso: string;
+  date: Date;
+  count: number;
+}
+
 @Component({
   selector: 'app-partidos',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,14 +31,35 @@ export class PartidosComponent implements OnInit {
   readonly error = signal<string | null>(null);
   readonly success = signal<string | null>(null);
   readonly loading = signal(false);
-  readonly page = signal(0);
-  readonly pageSize = 10;
-  readonly paginados = computed(() =>
-    this.partidos().slice(this.page() * this.pageSize, (this.page() + 1) * this.pageSize)
-  );
-  readonly totalPages = computed(() =>
-    Math.max(1, Math.ceil(this.partidos().length / this.pageSize))
-  );
+  readonly diaSeleccionado = signal<string | null>(null);
+  readonly diaOffset = signal(0);
+  readonly diasPorPagina = 7;
+
+  readonly dias = computed<DiaInfo[]>(() => {
+    const mapa = new Map<string, DiaInfo>();
+    for (const p of this.partidos()) {
+      if (!p.fechaHora) continue;
+      const d = new Date(p.fechaHora);
+      const iso = d.toISOString().slice(0, 10);
+      if (!mapa.has(iso)) mapa.set(iso, { iso, date: new Date(iso + 'T00:00:00'), count: 0 });
+      mapa.get(iso)!.count++;
+    }
+    return Array.from(mapa.values()).sort((a, b) => a.iso.localeCompare(b.iso));
+  });
+
+  readonly diasVisibles = computed(() => {
+    const todos = this.dias();
+    const start = this.diaOffset();
+    return todos.slice(start, start + this.diasPorPagina);
+  });
+
+  readonly partidosDia = computed(() => {
+    const dia = this.diaSeleccionado();
+    if (!dia) return [];
+    return this.partidos()
+      .filter(p => p.fechaHora && new Date(p.fechaHora).toISOString().slice(0, 10) === dia)
+      .sort((a, b) => new Date(a.fechaHora!).getTime() - new Date(b.fechaHora!).getTime());
+  });
 
   readonly form = this.fb.group({
     idPartido: [null as number | null],
@@ -45,17 +72,53 @@ export class PartidosComponent implements OnInit {
     estado: ['A']
   });
 
-  ngOnInit(): void { this.cargar(); this.cargarEquipos(); }
+  ngOnInit(): void {
+    this.cargar();
+    this.cargarEquipos();
+  }
 
   cargar(): void {
     this.partidoService.getAll().subscribe({
-      next: d => this.partidos.set(d),
+      next: d => {
+        this.partidos.set(d);
+        if (!this.diaSeleccionado() && this.dias().length) {
+          this.diaSeleccionado.set(this.dias()[0].iso);
+        }
+      },
       error: () => this.error.set('Error al cargar partidos')
     });
   }
 
   cargarEquipos(): void {
-    this.equipoService.getAll().subscribe({ next: d => this.equipos.set(d) });
+    this.equipoService.getAll().subscribe({
+      next: d => this.equipos.set(
+        [...d].sort((a, b) => (a.nombre ?? '').localeCompare(b.nombre ?? '', 'es'))
+      )
+    });
+  }
+
+  seleccionarDia(iso: string): void { this.diaSeleccionado.set(iso); }
+
+  prevDias(): void {
+    this.diaOffset.update(v => Math.max(0, v - this.diasPorPagina));
+  }
+  nextDias(): void {
+    const total = this.dias().length;
+    this.diaOffset.update(v => Math.min(total - this.diasPorPagina, v + this.diasPorPagina));
+  }
+
+  equipo(id: number | null | undefined): EquipoDTO | undefined {
+    if (id == null) return undefined;
+    return this.equipos().find(e => e.idEquipo === id);
+  }
+
+  estadoPartido(p: PartidoDTO): 'FIN' | 'LIVE' | 'PEND' {
+    if (p.golesLocal != null && p.golesVisitante != null) return 'FIN';
+    if (!p.fechaHora) return 'PEND';
+    const now = Date.now();
+    const start = new Date(p.fechaHora).getTime();
+    if (now < start) return 'PEND';
+    return 'LIVE';
   }
 
   guardar(): void {
@@ -107,14 +170,6 @@ export class PartidosComponent implements OnInit {
       next: () => { this.success.set('Partido eliminado'); this.cargar(); },
       error: () => this.error.set('Error al eliminar partido')
     });
-  }
-
-  nextPage(): void { if (this.page() < this.totalPages() - 1) this.page.update(p => p + 1); }
-  prevPage(): void { if (this.page() > 0) this.page.update(p => p - 1); }
-
-  equipoNombre(id: number | null | undefined): string {
-    if (id == null) return '—';
-    return this.equipos().find(e => e.idEquipo === id)?.nombre ?? String(id);
   }
 
   limpiar(): void {

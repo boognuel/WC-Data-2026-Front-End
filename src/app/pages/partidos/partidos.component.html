@@ -1,7 +1,7 @@
-<div class="layout">
-  <header>
-    <h1>Partidos</h1>
-    <button type="button" (click)="abrirNuevo()">Nuevo</button>
+<div class="page">
+  <header class="page-header">
+    <h1>Partidos <span class="subtitle">— Cronograma fase de grupos</span></h1>
+    <button class="btn-primary" type="button" (click)="abrirNuevo()">＋ Nuevo partido</button>
   </header>
 
   @if (showForm()) {
@@ -18,7 +18,6 @@
               }
             </select>
           </div>
-
           <div>
             <label for="p-visitante">Equipo visitante</label>
             <select id="p-visitante" formControlName="idEquipoVisitante" aria-required="true">
@@ -28,122 +27,128 @@
               }
             </select>
           </div>
-
           <div>
             <label for="p-fase">Fase</label>
             <select id="p-fase" formControlName="fase" aria-required="true">
               <option value="">-- Seleccione --</option>
-              <option value="Grupos">Grupos</option>
-              <option value="Octavos">Octavos de final</option>
-              <option value="Cuartos">Cuartos de final</option>
-              <option value="Semis">Semifinal</option>
-              <option value="Tercero">Tercer puesto</option>
-              <option value="Final">Final</option>
+              <option value="Grupo A">Grupo A</option>
+              <option value="Grupo B">Grupo B</option>
+              <option value="Grupo C">Grupo C</option>
+              <option value="Grupo D">Grupo D</option>
+              <option value="Grupo E">Grupo E</option>
+              <option value="Grupo F">Grupo F</option>
+              <option value="Grupo G">Grupo G</option>
+              <option value="Grupo H">Grupo H</option>
+              <option value="Grupo I">Grupo I</option>
+              <option value="Grupo J">Grupo J</option>
+              <option value="Grupo K">Grupo K</option>
+              <option value="Grupo L">Grupo L</option>
             </select>
           </div>
-
           <div>
             <label for="p-fecha">Fecha y hora</label>
             <input id="p-fecha" type="datetime-local" formControlName="fechaHora" />
           </div>
-
           <div>
             <label for="p-glocal">Goles local</label>
             <input id="p-glocal" type="number" formControlName="golesLocal" min="0" />
           </div>
-
           <div>
             <label for="p-gvisitante">Goles visitante</label>
             <input id="p-gvisitante" type="number" formControlName="golesVisitante" min="0" />
           </div>
         </div>
         <div class="buttons">
-          <button type="submit" [disabled]="loading() || form.invalid">
+          <button class="btn-primary" type="submit" [disabled]="loading() || form.invalid">
             {{ loading() ? 'Guardando...' : 'Guardar' }}
           </button>
-          <button type="button" class="secondary" (click)="cancelar()">Cancelar</button>
+          <button class="btn-secondary" type="button" (click)="cancelar()">Cancelar</button>
         </div>
       </form>
-      @if (error()) {
-        <p class="mensaje error-text" role="alert">{{ error() }}</p>
-      }
-      @if (success()) {
-        <p class="mensaje" role="status">{{ success() }}</p>
-      }
+      @if (error()) { <p class="msg error" role="alert">{{ error() }}</p> }
+      @if (success()) { <p class="msg success" role="status">{{ success() }}</p> }
     </section>
   }
 
-  <section class="table-card">
-    <h2>Lista de partidos</h2>
-    <table aria-label="Tabla de partidos">
-      <thead>
-        <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Local</th>
-          <th scope="col">Visitante</th>
-          <th scope="col">Marcador</th>
-          <th scope="col">Fase</th>
-          <th scope="col">Fecha</th>
-          <th scope="col">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (p of paginados(); track p.idPartido) {
-          <tr>
-            <td>{{ p.idPartido }}</td>
-            <td>{{ equipoNombre(p.idEquipoLocal) }}</td>
-            <td>{{ equipoNombre(p.idEquipoVisitante) }}</td>
-            <td>
-              @if (p.golesLocal !== null && p.golesVisitante !== null) {
-                <strong>{{ p.golesLocal }} - {{ p.golesVisitante }}</strong>
-              } @else {
-                <span>Pendiente</span>
-              }
-            </td>
-            <td>{{ p.fase }}</td>
-            <td>{{ p.fechaHora | date: 'dd/MM/yyyy HH:mm' }}</td>
-            <td>
-              @if (p.estado === 'A') {
-                <button
-                  class="small"
-                  type="button"
-                  (click)="editar(p)"
-                  [attr.aria-label]="'Editar partido ' + p.idPartido"
-                >
-                  Editar
-                </button>
-                <button
-                  class="small danger"
-                  type="button"
-                  (click)="eliminar(p.idPartido!)"
-                  [attr.aria-label]="'Eliminar partido ' + p.idPartido"
-                >
-                  Eliminar
-                </button>
-              }
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
-    <div class="pagination" aria-label="Paginación de partidos">
-      <button
-        type="button"
-        (click)="prevPage()"
-        [disabled]="page() === 0"
-        aria-label="Página anterior"
-      >
-        &#8592;
-      </button>
-      <span>{{ page() + 1 }} / {{ totalPages() }}</span>
-      <button
-        type="button"
-        (click)="nextPage()"
-        [disabled]="page() === totalPages() - 1"
-        aria-label="Página siguiente"
-      >
-        &#8594;
-      </button>
+  @if (error() && !showForm()) { <p class="msg error" role="alert">{{ error() }}</p> }
+  @if (success() && !showForm()) { <p class="msg success" role="status">{{ success() }}</p> }
+
+  <div class="date-strip">
+    <button class="arrow" type="button" (click)="prevDias()" [disabled]="diaOffset() === 0" aria-label="Días anteriores">‹</button>
+    <div class="dates">
+      @for (d of diasVisibles(); track d.iso) {
+        <button
+          type="button"
+          class="date-tab"
+          [class.active]="diaSeleccionado() === d.iso"
+          (click)="seleccionarDia(d.iso)"
+        >
+          <span class="dow">{{ d.date | date: 'EEE' }}</span>
+          <span class="dom">{{ d.date | date: 'd MMM' }}</span>
+        </button>
+      }
     </div>
-  </section>
+    <button
+      class="arrow"
+      type="button"
+      (click)="nextDias()"
+      [disabled]="diaOffset() + diasPorPagina >= dias().length"
+      aria-label="Siguientes días"
+    >›</button>
+  </div>
+
+  @if (diaSeleccionado()) {
+    <h2 class="day-title">
+      {{ diaSeleccionado() | date: 'EEEE d MMMM' }}
+      <span class="day-count">· {{ partidosDia().length }} partidos</span>
+    </h2>
+
+    <div class="matches">
+      @for (p of partidosDia(); track p.idPartido) {
+        <article class="match-row" [class.live]="estadoPartido(p) === 'LIVE'">
+          <span class="match-time">{{ p.fechaHora | date: 'HH:mm' }}</span>
+
+          <div class="team-side local">
+            @if (equipo(p.idEquipoLocal)?.bandera; as b) {
+              <img [src]="b" alt="" class="flag-sm" referrerpolicy="no-referrer" />
+            } @else { <div class="flag-sm flag-placeholder"></div> }
+            <span class="team-name">{{ equipo(p.idEquipoLocal)?.nombre ?? '—' }}</span>
+          </div>
+
+          <div class="score">
+            @if (p.golesLocal != null && p.golesVisitante != null) {
+              <strong>{{ p.golesLocal }}</strong>
+              <span class="dash">-</span>
+              <strong>{{ p.golesVisitante }}</strong>
+            } @else {
+              <span class="vs">VS</span>
+            }
+          </div>
+
+          <div class="team-side visitor">
+            <span class="team-name">{{ equipo(p.idEquipoVisitante)?.nombre ?? '—' }}</span>
+            @if (equipo(p.idEquipoVisitante)?.bandera; as b) {
+              <img [src]="b" alt="" class="flag-sm" referrerpolicy="no-referrer" />
+            } @else { <div class="flag-sm flag-placeholder"></div> }
+          </div>
+
+          <span class="phase-badge">{{ p.fase }}</span>
+
+          <span class="status-badge" [class]="'status-' + estadoPartido(p).toLowerCase()">
+            {{ estadoPartido(p) }}
+          </span>
+
+          <div class="row-actions">
+            <button class="btn-mini" type="button" (click)="editar(p)" aria-label="Editar">✎</button>
+            <button class="btn-mini danger" type="button" (click)="eliminar(p.idPartido!)" aria-label="Eliminar">🗑</button>
+          </div>
+        </article>
+      }
+      @if (partidosDia().length === 0) {
+        <p class="empty">No hay partidos en este día.</p>
+      }
+    </div>
+  } @else {
+    <p class="empty">Selecciona un día para ver los partidos.</p>
+  }
 </div>
