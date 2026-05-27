@@ -35,9 +35,15 @@ export class UsuariosComponent implements OnInit {
 
   readonly form = this.fb.group({
     idUsuario: [null as number | null],
-    username: ['', [Validators.required, Validators.email]],
+    username: ['', [
+      Validators.required,
+      Validators.minLength(3),
+      Validators.maxLength(50),
+      Validators.pattern(/^[a-zA-Z0-9_]+$/)
+    ]],
     password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(8)]],
     nombreapellido: ['', Validators.required],
+    email: ['', [Validators.required, Validators.email]],
     idRol: [null as number | null, Validators.required]
   });
 
@@ -65,6 +71,7 @@ export class UsuariosComponent implements OnInit {
       username: raw.username!,
       password: raw.password!,
       nombreapellido: raw.nombreapellido!,
+      email: raw.email ?? undefined,
       idRol: Number(raw.idRol)
     };
     this.usuarioService.save(dto).subscribe({
@@ -95,6 +102,7 @@ export class UsuariosComponent implements OnInit {
       username: u.username,
       password: '——',
       nombreapellido: u.nombreapellido,
+      email: u.email ?? '',
       idRol: u.idRol ?? null
     });
     this.form.get('username')?.disable();

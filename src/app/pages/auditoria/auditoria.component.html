@@ -1,0 +1,45 @@
+<div class="layout">
+  <header>
+    <h1>Auditoría</h1>
+    <div class="header-actions">
+      <a routerLink="/equipos" class="btn-link">Equipos</a>
+      <button class="logout" type="button" (click)="salir()">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <section class="table-card">
+    <h2>Registro de auditoría</h2>
+    @if (error()) { <p class="mensaje error-text" role="alert">{{ error() }}</p> }
+    <table aria-label="Tabla de auditoría">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Usuario</th>
+          <th scope="col">Acción</th>
+          <th scope="col">Tabla</th>
+          <th scope="col">Registro</th>
+          <th scope="col">Fecha y hora</th>
+          <th scope="col">IP</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (a of paginados(); track a.idLog) {
+          <tr>
+            <td>{{ a.idLog }}</td>
+            <td>{{ usernameDe(a.idUsuario) }}</td>
+            <td>{{ a.accion }}</td>
+            <td>{{ a.tablaAfectada }}</td>
+            <td>{{ a.idRegistroAfectado ?? '—' }}</td>
+            <td>{{ a.fechaHora | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+            <td>{{ a.ipCliente ?? '—' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    <div class="pagination" aria-label="Paginación de auditoría">
+      <button type="button" (click)="prevPage()" [disabled]="page() === 0" aria-label="Página anterior">&#8592;</button>
+      <span>{{ page() + 1 }} / {{ totalPages() }}</span>
+      <button type="button" (click)="nextPage()" [disabled]="page() === totalPages() - 1" aria-label="Página siguiente">&#8594;</button>
+    </div>
+  </section>
+</div>

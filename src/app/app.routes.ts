@@ -33,7 +33,8 @@ export const routes: Routes = [
       { path: 'reportes', loadComponent: () => import('./pages/reportes/reportes.component').then(m => m.ReportesComponent) },
       { path: 'parametros', canActivate: [roleGuard], data: { roles: [1] }, loadComponent: () => import('./pages/parametros/parametros.component').then(m => m.ParametrosComponent) },
       { path: 'roles', canActivate: [roleGuard], data: { roles: [1] }, loadComponent: () => import('./pages/roles/roles.component').then(m => m.RolesComponent) },
-      { path: 'usuarios', canActivate: [roleGuard], data: { roles: [1] }, loadComponent: () => import('./pages/usuarios/usuarios.component').then(m => m.UsuariosComponent) }
+      { path: 'usuarios', canActivate: [roleGuard], data: { roles: [1] }, loadComponent: () => import('./pages/usuarios/usuarios.component').then(m => m.UsuariosComponent) },
+      { path: 'auditoria', canActivate: [roleGuard], data: { roles: [1] }, loadComponent: () => import('./pages/auditoria/auditoria.component').then(m => m.AuditoriaComponent) }
     ]
   },
   { path: '**', redirectTo: 'login' }

@@ -20,7 +20,12 @@ export class RegistroComponent {
     readonly loading = signal(false);
 
     readonly form = this.fb.group({
-        username: ['', [Validators.required, Validators.email]],
+        username: ['', [
+            Validators.required,
+            Validators.minLength(3),
+            Validators.maxLength(50),
+            Validators.pattern(/^[a-zA-Z0-9_]+$/)
+        ]],
         password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(8)]],
         nombreapellido: ['', Validators.required],
         email: ['', [Validators.required, Validators.email]]

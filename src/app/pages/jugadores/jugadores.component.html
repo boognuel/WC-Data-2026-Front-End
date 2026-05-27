@@ -47,6 +47,21 @@
             <label for="j-fecha">Fecha de nacimiento</label>
             <input id="j-fecha" type="date" formControlName="fechaNacimiento" />
           </div>
+          <div>
+            <label for="j-foto">Foto</label>
+            <input
+              id="j-foto"
+              type="file"
+              accept="image/*"
+              (change)="onFileChange($event)"
+              aria-label="Seleccionar foto del jugador"
+            />
+          </div>
+          @if (previewUrl()) {
+            <div class="preview-cell">
+              <img [src]="previewUrl()!" alt="Vista previa foto" class="preview-img" />
+            </div>
+          }
         </div>
         <div class="buttons">
           <button type="submit" [disabled]="loading() || form.invalid">
@@ -74,6 +89,7 @@
           <th scope="col">Posición</th>
           <th scope="col">#</th>
           <th scope="col">Equipo</th>
+          <th scope="col">Foto</th>
           <th scope="col">Acciones</th>
         </tr>
       </thead>
@@ -85,6 +101,11 @@
             <td>{{ j.posicion }}</td>
             <td>{{ j.numeroCamiseta }}</td>
             <td>{{ equipoNombre(j.idEquipo) }}</td>
+            <td>
+              @if (j.foto) {
+                <img [src]="j.foto" [alt]="'Foto ' + j.nombre" class="thumb" />
+              }
+            </td>
             <td>
               @if (j.estado === 'A') {
                 <button

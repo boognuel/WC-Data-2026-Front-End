@@ -4,15 +4,21 @@
     <p>Crea tu cuenta de usuario externo</p>
 
     <form [formGroup]="form" (ngSubmit)="registrar()" novalidate>
-      <label for="r-username">Usuario (correo)</label>
+      <label for="r-username">Usuario</label>
       <input
         id="r-username"
-        type="email"
+        type="text"
         formControlName="username"
-        placeholder="usuario@correo.com"
+        placeholder="3-50 caracteres: letras, números y _"
         autocomplete="username"
+        maxlength="50"
         aria-required="true"
       />
+      @if (form.controls.username.touched && form.controls.username.invalid) {
+        <small class="hint-error">
+          El usuario debe tener entre 3 y 50 caracteres, solo letras, números y guion bajo.
+        </small>
+      }
 
       <label for="r-email">Correo electrónico</label>
       <input

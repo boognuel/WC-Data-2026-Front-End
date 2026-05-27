@@ -19,6 +19,8 @@ export class JugadoresComponent implements OnInit {
 
   readonly jugadores = signal<JugadorDTO[]>([]);
   readonly equipos = signal<EquipoDTO[]>([]);
+  readonly selectedFile = signal<File | null>(null);
+  readonly previewUrl = signal<string | null>(null);
   readonly editMode = signal(false);
   readonly showForm = signal(false);
   readonly error = signal<string | null>(null);
@@ -40,7 +42,8 @@ export class JugadoresComponent implements OnInit {
     posicion: ['', Validators.required],
     numeroCamiseta: [null as number | null, Validators.required],
     fechaNacimiento: [''],
-    estado: ['A']
+    estado: ['A'],
+    foto: ['']
   });
 
   ngOnInit(): void { this.cargar(); this.cargarEquipos(); }
@@ -68,7 +71,7 @@ export class JugadoresComponent implements OnInit {
       numeroCamiseta: Number(raw.numeroCamiseta),
       fechaNacimiento: raw.fechaNacimiento || null,
     } as JugadorDTO;
-    this.jugadorService.save(dto).subscribe({
+    this.jugadorService.save(dto, this.selectedFile()).subscribe({
       next: () => {
         this.loading.set(false);
         this.success.set('Jugador guardado correctamente');
@@ -88,6 +91,7 @@ export class JugadoresComponent implements OnInit {
   editar(j: JugadorDTO): void {
     this.showForm.set(true);
     this.editMode.set(true);
+    this.previewUrl.set(j.foto ?? null);
     this.form.patchValue({
       idJugador: j.idJugador ?? null,
       idEquipo: j.idEquipo,
@@ -95,7 +99,8 @@ export class JugadoresComponent implements OnInit {
       posicion: j.posicion,
       numeroCamiseta: j.numeroCamiseta,
       fechaNacimiento: j.fechaNacimiento ? String(j.fechaNacimiento).slice(0, 10) : '',
-      estado: j.estado
+      estado: j.estado,
+      foto: j.foto ?? ''
     });
   }
 
@@ -114,9 +119,23 @@ export class JugadoresComponent implements OnInit {
     return this.equipos().find(e => e.idEquipo === idEquipo)?.nombre ?? String(idEquipo);
   }
 
+  onFileChange(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0] ?? null;
+    this.selectedFile.set(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = e => this.previewUrl.set(e.target?.result as string);
+      reader.readAsDataURL(file);
+    } else {
+      this.previewUrl.set(null);
+    }
+  }
+
   limpiar(): void {
     this.form.reset({ estado: 'A' });
     this.editMode.set(false);
+    this.selectedFile.set(null);
+    this.previewUrl.set(null);
     this.error.set(null);
     this.success.set(null);
   }

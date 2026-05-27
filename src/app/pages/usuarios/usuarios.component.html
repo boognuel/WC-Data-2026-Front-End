@@ -10,13 +10,31 @@
       <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
         <div class="grid">
           <div>
-            <label for="u-username">Username (correo)</label>
+            <label for="u-username">Username</label>
             <input
               id="u-username"
-              type="email"
+              type="text"
               formControlName="username"
               [attr.disabled]="editMode() ? true : null"
+              placeholder="3-50 caracteres: letras, números y _"
+              maxlength="50"
               aria-required="true"
+            />
+            @if (form.controls.username.touched && form.controls.username.invalid) {
+              <small class="hint-error">
+                Solo letras, números y guion bajo (3-50 caracteres).
+              </small>
+            }
+          </div>
+
+          <div>
+            <label for="u-email">Correo electrónico</label>
+            <input
+              id="u-email"
+              type="email"
+              formControlName="email"
+              aria-required="true"
+              placeholder="ejemplo@dominio.com"
             />
           </div>
 
@@ -76,6 +94,7 @@
         <tr>
           <th scope="col">ID</th>
           <th scope="col">Username</th>
+          <th scope="col">Email</th>
           <th scope="col">Nombre</th>
           <th scope="col">Rol</th>
           <th scope="col">Estado</th>
@@ -88,6 +107,7 @@
           <tr [class.bloqueado]="u.estado === 'I'">
             <td>{{ u.idUsuario }}</td>
             <td>{{ u.username }}</td>
+            <td>{{ u.email ?? '—' }}</td>
             <td>{{ u.nombreapellido }}</td>
             <td>{{ rolNombre(u.idRol) }}</td>
             <td>

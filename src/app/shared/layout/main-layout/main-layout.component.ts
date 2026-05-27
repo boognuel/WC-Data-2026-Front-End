@@ -34,8 +34,8 @@ export class MainLayoutComponent {
     readonly roleName = computed(() => {
         const id = this.auth.currentUser()?.idRol;
         if (id === 1) return 'Administrador';
-        if (id === 2) return 'Operador';
-        return 'Espectador';
+        if (id === 2) return 'Operario';
+        return 'Usuario Externo';
     });
 
     private readonly allNav: NavItem[] = [
@@ -48,6 +48,7 @@ export class MainLayoutComponent {
         { label: 'Parámetros', icon: '⚙️', route: '/parametros', requiredRoles: [1] },
         { label: 'Roles', icon: '🔑', route: '/roles', requiredRoles: [1] },
         { label: 'Usuarios', icon: '👤', route: '/usuarios', requiredRoles: [1] },
+        { label: 'Auditoría', icon: '📜', route: '/auditoria', requiredRoles: [1] },
     ];
 
     readonly visibleNav = computed(() => {

@@ -12,8 +12,11 @@ export class JugadorService {
     return this.http.get<JugadorDTO[]>(`${this.baseUrl}/getAll`);
   }
 
-  save(dto: JugadorDTO): Observable<JugadorDTO> {
-    return this.http.post<JugadorDTO>(`${this.baseUrl}/saveJugador`, dto);
+  save(dto: JugadorDTO, file?: File | null): Observable<JugadorDTO> {
+    const formData = new FormData();
+    formData.append('jugador', new Blob([JSON.stringify(dto)], { type: 'application/json' }));
+    if (file) formData.append('foto', file);
+    return this.http.post<JugadorDTO>(`${this.baseUrl}/saveJugador`, formData);
   }
 
   findById(id: number): Observable<JugadorDTO> {
