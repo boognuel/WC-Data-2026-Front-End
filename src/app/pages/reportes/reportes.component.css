@@ -136,3 +136,36 @@ tr.top td {
         flex-direction: column;
     }
 }
+
+/* ...mantén el CSS que ya tenías y agrega: */
+
+.charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.chart-card {
+    background: #111111;
+    padding: 22px;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+}
+
+.chart-card h2 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    color: #DDDDDD;
+}
+
+.chart-wrap {
+    position: relative;
+    height: 300px;
+}
+
+@media (max-width: 768px) {
+    .charts-row {
+        grid-template-columns: 1fr;
+    }
+}

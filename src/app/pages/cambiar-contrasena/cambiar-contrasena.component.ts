@@ -33,11 +33,10 @@ export class CambiarContrasenaComponent {
         this.loading.set(true);
         this.error.set(null);
         const raw = this.form.value;
+        // Sólo se envían username y password — la firma de cambiarContrasena lo espera así
         this.usuarioService.cambiarContrasena({
             username: raw.username!,
-            password: raw.password!,
-            nombreapellido: '',
-            idRol: 0
+            password: raw.password!
         }).subscribe({
             next: (user) => {
                 this.loading.set(false);

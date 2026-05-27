@@ -6,4 +6,5 @@ export interface JugadorDTO {
   numeroCamiseta: number;
   fechaNacimiento?: string | null;
   estado: string;
+  foto?: string | null;
 }

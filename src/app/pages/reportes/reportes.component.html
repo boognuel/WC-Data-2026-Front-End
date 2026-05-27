@@ -1,11 +1,6 @@
 <div class="layout">
   <header>
     <h1>Reportes y Estadísticas</h1>
-    <div class="header-actions">
-      <a routerLink="/partidos" class="btn-link">Partidos</a>
-      <a routerLink="/equipos" class="btn-link">Equipos</a>
-      <button class="logout" type="button" (click)="salir()">Cerrar sesión</button>
-    </div>
   </header>
 
   <section class="actions-card">
@@ -16,8 +11,27 @@
       <button type="button" (click)="pdfEstadisticas()">PDF Estadísticas</button>
       <button type="button" class="excel" (click)="excelEstadisticas()">Excel Estadísticas</button>
     </div>
-    @if (error()) { <p class="error-text" role="alert">{{ error() }}</p> }
+    @if (error()) {
+      <p class="error-text" role="alert">{{ error() }}</p>
+    }
   </section>
+
+  <!-- Charts row -->
+  <div class="charts-row">
+    <section class="chart-card">
+      <h2>Goles por equipo</h2>
+      <div class="chart-wrap">
+        <canvas #chartGoles aria-label="Goles por equipo"></canvas>
+      </div>
+    </section>
+
+    <section class="chart-card">
+      <h2>Partidos por fase</h2>
+      <div class="chart-wrap">
+        <canvas #chartFases aria-label="Partidos por fase"></canvas>
+      </div>
+    </section>
+  </div>
 
   <section class="table-card">
     <h2>Tabla de posiciones</h2>
@@ -49,7 +63,9 @@
               <td>{{ s.partidosEmpatados }}</td>
               <td>{{ s.golesAFavor }}</td>
               <td>{{ s.golesEnContra }}</td>
-              <td><strong>{{ s.puntos }}</strong></td>
+              <td>
+                <strong>{{ s.puntos }}</strong>
+              </td>
             </tr>
           }
         </tbody>
