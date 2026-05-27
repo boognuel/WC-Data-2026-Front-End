@@ -88,16 +88,16 @@ export class ReportesComponent implements OnInit, OnDestroy {
           {
             label: 'Goles a favor',
             data: gf,
-            backgroundColor: 'rgba(255,72,0,0.75)',
-            borderColor: '#ff4800',
+            backgroundColor: 'rgba(225,29,72,0.75)',
+            borderColor: '#e11d48',
             borderWidth: 1,
             borderRadius: 4
           },
           {
             label: 'Goles en contra',
             data: gc,
-            backgroundColor: 'rgba(107,0,232,0.65)',
-            borderColor: '#6B00E8',
+            backgroundColor: 'rgba(37,99,235,0.6)',
+            borderColor: '#2563eb',
             borderWidth: 1,
             borderRadius: 4
           }
@@ -107,12 +107,12 @@ export class ReportesComponent implements OnInit, OnDestroy {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { labels: { color: '#ddd' } },
+          legend: { labels: { color: '#1a1a1a' } },
           title: { display: false }
         },
         scales: {
-          x: { ticks: { color: '#aaa', maxRotation: 45 }, grid: { color: '#1f1f1f' } },
-          y: { ticks: { color: '#aaa' }, grid: { color: '#1f1f1f' }, beginAtZero: true }
+          x: { ticks: { color: '#6b7280', maxRotation: 45 }, grid: { color: '#e5e5e5' } },
+          y: { ticks: { color: '#6b7280' }, grid: { color: '#e5e5e5' }, beginAtZero: true }
         }
       }
     });
@@ -132,7 +132,8 @@ export class ReportesComponent implements OnInit, OnDestroy {
     const labels = Object.keys(counts);
     const data = Object.values(counts);
     const palette = [
-      '#ff4800', '#6B00E8', '#06CB4B', '#FFD700', '#00BFFF', '#FF69B4', '#20C997', '#E50000'
+      '#e11d48', '#2563eb', '#16a34a', '#f59e0b', '#a855f7', '#06b6d4', '#ec4899', '#84cc16',
+      '#f97316', '#0ea5e9', '#10b981', '#6366f1'
     ];
 
     this.fasesChart = new Chart(canvas, {
@@ -142,7 +143,7 @@ export class ReportesComponent implements OnInit, OnDestroy {
         datasets: [{
           data,
           backgroundColor: palette.slice(0, labels.length),
-          borderColor: '#111',
+          borderColor: '#fff',
           borderWidth: 2
         }]
       },
@@ -150,7 +151,7 @@ export class ReportesComponent implements OnInit, OnDestroy {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { position: 'right', labels: { color: '#ddd', padding: 16 } }
+          legend: { position: 'right', labels: { color: '#1a1a1a', padding: 12, font: { size: 11 } } }
         }
       }
     });

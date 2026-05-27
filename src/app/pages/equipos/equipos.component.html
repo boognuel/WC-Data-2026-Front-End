@@ -3,7 +3,9 @@
     <div>
       <h1>Selecciones <span class="subtitle">— Fase de Grupos</span></h1>
     </div>
-    <button class="btn-primary" type="button" (click)="abrirNuevo()">＋ Nueva selección</button>
+    @if (canManage()) {
+      <button class="btn-primary" type="button" (click)="abrirNuevo()">＋ Nueva selección</button>
+    }
   </header>
 
   <div class="filter-bar">
@@ -99,10 +101,12 @@
             <strong>{{ e.puntos }} pts</strong>
             <span>{{ e.ganados }}G {{ e.empatados }}E {{ e.perdidos }}P</span>
           </div>
-          <div class="actions">
-            <button class="btn-mini" type="button" (click)="editar(e)">Editar</button>
-            <button class="btn-mini danger" type="button" (click)="eliminar(e.idEquipo!)">Eliminar</button>
-          </div>
+          @if (canManage()) {
+            <div class="actions">
+              <button class="btn-mini" type="button" (click)="editar(e)">Editar</button>
+              <button class="btn-mini danger" type="button" (click)="eliminar(e.idEquipo!)">Eliminar</button>
+            </div>
+          }
         </div>
       </article>
     }

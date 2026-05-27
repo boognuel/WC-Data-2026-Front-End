@@ -1,7 +1,9 @@
 <div class="layout">
   <header>
     <h1>Grupos</h1>
-    <button type="button" (click)="abrirNuevo()">Nuevo</button>
+    @if (canManage()) {
+      <button type="button" (click)="abrirNuevo()">Nuevo</button>
+    }
   </header>
 
   @if (showForm()) {
@@ -59,7 +61,7 @@
             <td>{{ g.descripcion }}</td>
             <td>{{ g.estado === 'A' ? 'Activo' : 'Inactivo' }}</td>
             <td>
-              @if (g.estado === 'A') {
+              @if (canManage() && g.estado === 'A') {
                 <button
                   class="small"
                   type="button"

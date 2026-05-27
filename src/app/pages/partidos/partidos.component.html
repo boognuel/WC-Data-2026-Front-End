@@ -1,7 +1,9 @@
 <div class="page">
   <header class="page-header">
     <h1>Partidos <span class="subtitle">— Cronograma fase de grupos</span></h1>
-    <button class="btn-primary" type="button" (click)="abrirNuevo()">＋ Nuevo partido</button>
+    @if (canManage()) {
+      <button class="btn-primary" type="button" (click)="abrirNuevo()">＋ Nuevo partido</button>
+    }
   </header>
 
   @if (showForm()) {
@@ -138,10 +140,16 @@
             {{ estadoPartido(p) }}
           </span>
 
-          <div class="row-actions">
-            <button class="btn-mini" type="button" (click)="editar(p)" aria-label="Editar">✎</button>
-            <button class="btn-mini danger" type="button" (click)="eliminar(p.idPartido!)" aria-label="Eliminar">🗑</button>
-          </div>
+          @if (canEdit() || canManage()) {
+            <div class="row-actions">
+              @if (canEdit()) {
+                <button class="btn-mini" type="button" (click)="editar(p)" aria-label="Editar">✎</button>
+              }
+              @if (canManage()) {
+                <button class="btn-mini danger" type="button" (click)="eliminar(p.idPartido!)" aria-label="Eliminar">🗑</button>
+              }
+            </div>
+          }
         </article>
       }
       @if (partidosDia().length === 0) {

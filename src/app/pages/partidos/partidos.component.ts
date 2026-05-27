@@ -3,6 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { PartidoService } from '../../services/partido.service';
 import { EquipoService } from '../../services/equipo.service';
+import { AuthService } from '../../services/auth.service';
 import { PartidoDTO } from '../../models/partido.model';
 import { EquipoDTO } from '../../models/equipo.model';
 
@@ -23,6 +24,10 @@ export class PartidosComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly partidoService = inject(PartidoService);
   private readonly equipoService = inject(EquipoService);
+  private readonly auth = inject(AuthService);
+
+  readonly canManage = computed(() => this.auth.canManage());
+  readonly canEdit = computed(() => this.auth.canEditPartido());
 
   readonly partidos = signal<PartidoDTO[]>([]);
   readonly equipos = signal<EquipoDTO[]>([]);

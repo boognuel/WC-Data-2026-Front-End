@@ -226,22 +226,29 @@
   margin-top: 4px;
 }
 
-.btn-mini {
+.actions .btn-mini {
   flex: 1;
   background: var(--bg);
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: 4px;
-  padding: 5px 8px;
+  padding: 6px 8px;
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.15s;
+  text-align: center;
 }
 
-.btn-mini:hover { background: var(--text); color: #fff; border-color: var(--text); }
-.btn-mini.danger { color: var(--danger); }
-.btn-mini.danger:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+.actions .btn-mini:hover { background: var(--text); color: #fff; border-color: var(--text); }
+
+.actions .btn-mini.danger {
+  color: #fff;
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+.actions .btn-mini.danger:hover { background: #b91c1c; border-color: #b91c1c; }
 
 .empty {
   grid-column: 1 / -1;

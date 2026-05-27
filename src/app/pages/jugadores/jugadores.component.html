@@ -1,7 +1,9 @@
 <div class="layout">
   <header>
     <h1>Jugadores</h1>
-    <button type="button" (click)="abrirNuevo()">Nuevo</button>
+    @if (canManage()) {
+      <button type="button" (click)="abrirNuevo()">Nuevo</button>
+    }
   </header>
 
   @if (showForm()) {
@@ -107,7 +109,7 @@
               }
             </td>
             <td>
-              @if (j.estado === 'A') {
+              @if (canManage() && j.estado === 'A') {
                 <button
                   class="small"
                   type="button"

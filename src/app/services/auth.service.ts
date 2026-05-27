@@ -47,4 +47,16 @@ export class AuthService {
     const u = this.currentUser();
     return u !== null && u.idRol === 1;
   }
+  isOperario(): boolean {
+    const u = this.currentUser();
+    return u !== null && u.idRol === 2;
+  }
+  isExterno(): boolean {
+    const u = this.currentUser();
+    return u !== null && u.idRol === 3;
+  }
+  // Solo admin maneja CRUD de equipos, jugadores, estadios, grupos
+  canManage(): boolean { return this.isAdmin(); }
+  // Admin y operario pueden editar resultados de partidos
+  canEditPartido(): boolean { return this.isAdmin() || this.isOperario(); }
 }

@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } 
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { EquipoService } from '../../services/equipo.service';
 import { JugadorService } from '../../services/jugador.service';
+import { AuthService } from '../../services/auth.service';
 import { EquipoDTO } from '../../models/equipo.model';
 import { JugadorDTO } from '../../models/jugador.model';
 
@@ -16,6 +17,9 @@ export class JugadoresComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly jugadorService = inject(JugadorService);
   private readonly equipoService = inject(EquipoService);
+  private readonly auth = inject(AuthService);
+
+  readonly canManage = computed(() => this.auth.canManage());
 
   readonly jugadores = signal<JugadorDTO[]>([]);
   readonly equipos = signal<EquipoDTO[]>([]);

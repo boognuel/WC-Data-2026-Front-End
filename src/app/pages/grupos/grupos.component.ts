@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { GrupoService } from '../../services/grupo.service';
+import { AuthService } from '../../services/auth.service';
 import { GrupoDTO } from '../../models/grupo.model';
 
 @Component({
@@ -13,6 +14,9 @@ import { GrupoDTO } from '../../models/grupo.model';
 export class GruposComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly grupoService = inject(GrupoService);
+  private readonly auth = inject(AuthService);
+
+  readonly canManage = computed(() => this.auth.canManage());
 
   readonly grupos = signal<GrupoDTO[]>([]);
   readonly editMode = signal(false);

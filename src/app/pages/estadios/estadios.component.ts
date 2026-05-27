@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { EstadioService } from '../../services/estadio.service';
+import { AuthService } from '../../services/auth.service';
 import { EstadioDTO } from '../../models/estadio.model';
 
 @Component({
@@ -13,6 +14,9 @@ import { EstadioDTO } from '../../models/estadio.model';
 export class EstadiosComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly estadioService = inject(EstadioService);
+  private readonly auth = inject(AuthService);
+
+  readonly canManage = computed(() => this.auth.canManage());
 
   readonly estadios = signal<EstadioDTO[]>([]);
   readonly selectedFile = signal<File | null>(null);

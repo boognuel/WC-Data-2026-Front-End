@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } 
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { EquipoService } from '../../services/equipo.service';
 import { ReporteService } from '../../services/reporte.service';
+import { AuthService } from '../../services/auth.service';
 import { EquipoDTO } from '../../models/equipo.model';
 import { EstadisticaDTO } from '../../models/estadistica.model';
 
@@ -24,6 +25,9 @@ export class EquiposComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly equipoService = inject(EquipoService);
   private readonly reporteService = inject(ReporteService);
+  private readonly auth = inject(AuthService);
+
+  readonly canManage = computed(() => this.auth.canManage());
 
   readonly equipos = signal<EquipoDTO[]>([]);
   readonly estadisticas = signal<EstadisticaDTO[]>([]);

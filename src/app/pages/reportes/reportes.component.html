@@ -6,10 +6,8 @@
   <section class="actions-card">
     <h2>Descargas</h2>
     <div class="btn-group">
-      <button type="button" (click)="pdfPartidos()">PDF Partidos</button>
-      <button type="button" class="excel" (click)="excelPartidos()">Excel Partidos</button>
-      <button type="button" (click)="pdfEstadisticas()">PDF Estadísticas</button>
-      <button type="button" class="excel" (click)="excelEstadisticas()">Excel Estadísticas</button>
+      <button type="button" (click)="pdfEstadisticas()">📄 PDF</button>
+      <button type="button" class="excel" (click)="excelEstadisticas()">📊 Excel</button>
     </div>
     @if (error()) {
       <p class="error-text" role="alert">{{ error() }}</p>
