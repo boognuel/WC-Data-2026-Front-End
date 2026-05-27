@@ -2,11 +2,12 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { UsuarioService } from '../../services/usuario.service';
+import { WcLogoComponent } from '../../shared/wc-logo/wc-logo.component';
 
 @Component({
     selector: 'app-registro',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [ReactiveFormsModule, RouterLink],
+    imports: [ReactiveFormsModule, RouterLink, WcLogoComponent],
     templateUrl: './registro.component.html',
     styleUrl: './registro.component.css'
 })

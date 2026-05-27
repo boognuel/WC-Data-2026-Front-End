@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { RouterLinkActive, RouterLink, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { WcLogoComponent } from '../../wc-logo/wc-logo.component';
 
 interface NavItem {
     label: string;
@@ -18,7 +19,7 @@ interface NavItem {
 @Component({
     selector: 'app-main-layout',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [RouterOutlet, RouterLink, RouterLinkActive],
+    imports: [RouterOutlet, RouterLink, RouterLinkActive, WcLogoComponent],
     templateUrl: './main-layout.component.html',
     styleUrl: './main-layout.component.css',
 })

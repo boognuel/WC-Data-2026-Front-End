@@ -92,7 +92,9 @@
           <th scope="col">#</th>
           <th scope="col">Equipo</th>
           <th scope="col">Foto</th>
-          <th scope="col">Acciones</th>
+          @if (canManage()) {
+            <th scope="col">Acciones</th>
+          }
         </tr>
       </thead>
       <tbody>
@@ -108,26 +110,28 @@
                 <img [src]="j.foto" [alt]="'Foto ' + j.nombre" class="thumb" referrerpolicy="no-referrer" />
               }
             </td>
-            <td>
-              @if (canManage() && j.estado === 'A') {
-                <button
-                  class="small"
-                  type="button"
-                  [attr.aria-label]="'Editar ' + j.nombre"
-                  (click)="editar(j)"
-                >
-                  Editar
-                </button>
-                <button
-                  class="small danger"
-                  type="button"
-                  [attr.aria-label]="'Eliminar ' + j.nombre"
-                  (click)="eliminar(j.idJugador!)"
-                >
-                  Eliminar
-                </button>
-              }
-            </td>
+            @if (canManage()) {
+              <td>
+                @if (j.estado === 'A') {
+                  <button
+                    class="small"
+                    type="button"
+                    [attr.aria-label]="'Editar ' + j.nombre"
+                    (click)="editar(j)"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    class="small danger"
+                    type="button"
+                    [attr.aria-label]="'Eliminar ' + j.nombre"
+                    (click)="eliminar(j.idJugador!)"
+                  >
+                    Eliminar
+                  </button>
+                }
+              </td>
+            }
           </tr>
         }
       </tbody>

@@ -3,11 +3,12 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UsuarioService } from '../../services/usuario.service';
 import { AuthService } from '../../services/auth.service';
+import { WcLogoComponent } from '../../shared/wc-logo/wc-logo.component';
 
 @Component({
     selector: 'app-cambiar-contrasena',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [ReactiveFormsModule],
+    imports: [ReactiveFormsModule, WcLogoComponent],
     templateUrl: './cambiar-contrasena.component.html',
     styleUrl: './cambiar-contrasena.component.css'
 })

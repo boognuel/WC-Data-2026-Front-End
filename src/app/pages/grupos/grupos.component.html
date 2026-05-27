@@ -51,7 +51,9 @@
           <th scope="col">ID</th>
           <th scope="col">Descripción</th>
           <th scope="col">Estado</th>
-          <th scope="col">Acciones</th>
+          @if (canManage()) {
+            <th scope="col">Acciones</th>
+          }
         </tr>
       </thead>
       <tbody>
@@ -60,26 +62,28 @@
             <td>{{ g.idGrupo }}</td>
             <td>{{ g.descripcion }}</td>
             <td>{{ g.estado === 'A' ? 'Activo' : 'Inactivo' }}</td>
-            <td>
-              @if (canManage() && g.estado === 'A') {
-                <button
-                  class="small"
-                  type="button"
-                  (click)="editar(g)"
-                  [attr.aria-label]="'Editar grupo ' + g.idGrupo"
-                >
-                  Editar
-                </button>
-                <button
-                  class="small danger"
-                  type="button"
-                  (click)="eliminar(g.idGrupo!)"
-                  [attr.aria-label]="'Eliminar grupo ' + g.idGrupo"
-                >
-                  Eliminar
-                </button>
-              }
-            </td>
+            @if (canManage()) {
+              <td>
+                @if (g.estado === 'A') {
+                  <button
+                    class="small"
+                    type="button"
+                    (click)="editar(g)"
+                    [attr.aria-label]="'Editar grupo ' + g.idGrupo"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    class="small danger"
+                    type="button"
+                    (click)="eliminar(g.idGrupo!)"
+                    [attr.aria-label]="'Eliminar grupo ' + g.idGrupo"
+                  >
+                    Eliminar
+                  </button>
+                }
+              </td>
+            }
           </tr>
         }
       </tbody>
