@@ -1,29 +1,29 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { EquipoDTO } from '../models/equipo.model';
+import { DelanteroDTO } from '../models/Delantero.model';
 
 @Injectable({ providedIn: 'root' })
-export class EquipoService {
+export class DelanteroService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8114/Mundial2026_V1/equipo';
+  private readonly baseUrl = 'http://localhost:8114/Mundial2026_V1/Delantero';
 
-  getAll(): Observable<EquipoDTO[]> {
-    return this.http.get<EquipoDTO[]>(`${this.baseUrl}/getAll`);
+  getAll(): Observable<DelanteroDTO[]> {
+    return this.http.get<DelanteroDTO[]>(`${this.baseUrl}/getAll`);
   }
 
-  save(dto: EquipoDTO, file?: File | null): Observable<EquipoDTO> {
+  save(dto: DelanteroDTO, file?: File | null): Observable<DelanteroDTO> {
     const formData = new FormData();
-    formData.append('equipo', new Blob([JSON.stringify(dto)], { type: 'application/json' }));
+    formData.append('Delantero', new Blob([JSON.stringify(dto)], { type: 'application/json' }));
     if (file) formData.append('bandera', file);
-    return this.http.post<EquipoDTO>(`${this.baseUrl}/saveEquipo`, formData);
+    return this.http.post<DelanteroDTO>(`${this.baseUrl}/saveDelantero`, formData);
   }
 
-  findById(id: number): Observable<EquipoDTO> {
-    return this.http.get<EquipoDTO>(`${this.baseUrl}/findRecord/${id}`);
+  findById(id: number): Observable<DelanteroDTO> {
+    return this.http.get<DelanteroDTO>(`${this.baseUrl}/findRecord/${id}`);
   }
 
-  delete(id: number): Observable<EquipoDTO> {
-    return this.http.delete<EquipoDTO>(`${this.baseUrl}/deleteEquipo/${id}`);
+  delete(id: number): Observable<DelanteroDTO> {
+    return this.http.delete<DelanteroDTO>(`${this.baseUrl}/deleteDelantero/${id}`);
   }
 }
